@@ -1,0 +1,205 @@
+# This file contains the order and numbering for all sections in the book.
+#
+# It is a sample TOC file to help you get started. Fill it out with entries
+# for your own content.
+#
+# Each entry has the following schema:
+#
+# - title: mytitle   # Title of chapter or section
+#   url: /myurl  # URL of section relative to the /content/ folder.
+#   sections:  # Contains a list of more entries that make up the chapter's sections
+#   not_numbered: true  # if the section shouldn't have a number in the sidebar
+#     (e.g. Introduction or appendices)
+#   expand_sections: true  # if you'd like the sections of this chapter to always
+#     be expanded in the sidebar.
+#   external: true  # Whether the URL is an external link or points to content in the book
+#
+# Below are some special values that trigger specific behavior:
+# - search: true  # Will provide a link to a search page
+# - divider: true  # Will insert a divider in the sidebar
+# - header: My Header  # Will insert a header with no link in the sidebar
+#
+# See the links below for an example.
+
+# Top-level page
+- title: Getting Started
+  url: /index
+  not_numbered: true
+- title: Symbulate Objects & The Probability World
+  url: /symobj
+  not_numbered: true
+  sections:
+  - title: Probability Spaces
+    url: /probspace
+    not_numbered: true
+  - title: Random Variables
+    url: /rv
+    not_numbered: true
+  - title: Events
+    #url: /events
+    not_numbered: true
+  - title: Random Processes
+    url: /process
+    not_numbered: true
+  - title: Transformations
+    #url: /symobj
+    not_numbered: true
+  - title: Slicing/Unpacking
+    #url: /symobj
+    not_numbered: true
+  - title: Joining
+    #url: /symobj
+    not_numbered: true
+
+# Top-level page
+- title: Simulation World
+  url: /simworld
+  not_numbered: true
+  sections:
+  - title: Simulations
+    url: /sim
+    not_numbered: true
+  - title: Space Operations
+    url: /symobj
+    not_numbered: true
+  - title: Vectorized Operations
+    url: /symobj
+    not_numbered: true
+  - title: Transformations
+    url: /symobj
+    not_numbered: true
+  - title: Slicing
+    url: /symobj
+    not_numbered: true
+  - title: Filter
+    url: /filter
+    not_numbered: true
+
+# Top-level page
+- title: Summarizing Simulations
+  url: /common_general_comments
+  not_numbered: true
+  sections:
+  - title: Tabulate
+    url: /symobj
+    not_numbered: true
+  - title: Count
+    url: /symobj
+    not_numbered: true
+  - title: Mean
+    url: /symobj
+    not_numbered: true
+  - title: Variance
+    url: /symobj
+    not_numbered: true
+  - title: Standard Deviation
+    url: /symobj
+    not_numbered: true
+  - title: Covariance
+    url: /symobj
+    not_numbered: true
+  - title: Correlation
+    url: /symobj
+    not_numbered: true
+  
+# Top-level page
+- title: Graphics
+  url: /graphics
+  not_numbered: true
+  sections:
+  - title: Rug
+    url: /rug
+    not_numbered: true
+  - title: Impulse
+    url: /impulse
+    not_numbered: true
+  - title: Histogram
+    url: /hist
+    not_numbered: true
+  - title: Density
+    url: /symobj
+    not_numbered: true
+  - title: Scatter Plot
+    url: /symobj
+    not_numbered: true
+  - title: Tile
+    url: /symobj
+    not_numbered: true
+  - title: 2D Histogram
+    url: /symobj
+    not_numbered: true
+  - title: 2D Density
+    url: /symobj
+    not_numbered: true
+  - title: Marginal
+    url: /symobj
+    not_numbered: true
+  - title: Jitter
+    url: /symobj
+    not_numbered: true
+  - title: Sample Path
+    url: /symobj
+    not_numbered: true
+  - title: Spaghetti 
+    url: /symobj
+    not_numbered: true
+
+# Top-level page
+- title: Conditional Random Variables
+  url: /conditioning
+  not_numbered: true
+
+# Top-level page
+- title: Custom Probability Spaces
+  url: /simworld
+  not_numbered: true
+  sections:
+  - title: AssumeIndependent
+    url: /symobj
+    not_numbered: true
+  - title: Custom Spaces
+    url: /symobj
+    not_numbered: true
+
+
+# Top-level page
+- title: Common Discrete Models
+  url: /common_discrete
+  not_numbered: true
+
+# Top-level page
+- title: Common Continuous Models
+  url: /common_continuous
+  not_numbered: true
+
+# Top-level page
+- title: Common Joint Models
+  url: /common_joint
+  not_numbered: true
+  sections:
+  - title: Use this!
+    url: /joint
+    not_numbered: true
+
+# Top-level page
+- title: Random Processes
+  url: /symobj
+  not_numbered: true
+
+# Top-level page
+- title: Common Random Processes
+  url: /common_random
+  not_numbered: true
+  sections:
+  - title: Markov Processes
+    url: /mc
+    not_numbered: true
+
+
+
+
+# Divider for meta-pages and content page
+- divider: true
+
+
+

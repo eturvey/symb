@@ -1,0 +1,1050 @@
+---
+interact_link: content/conditioning.ipynb
+kernel_name: python3
+has_widgets: false
+title: |-
+  Conditional Random Variables
+prev_page:
+  url: /symobj.html
+  title: |-
+    Spaghetti
+next_page:
+  url: /simworld.html
+  title: |-
+    Custom Probability Spaces
+suffix: .ipynb
+
+comment: "***PROGRAMMATICALLY GENERATED, DO NOT EDIT. SEE ORIGINAL FILES IN /content***"
+---
+
+    <main class="jupyter-page">
+    
+<div class="jb_cell">
+
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h1 id="Conditioning">Conditioning<a class="anchor-link" href="#Conditioning"> </a></h1>
+</div>
+</div>
+</div>
+</div>
+
+<div class="jb_cell">
+
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p><a id='contents'></a></p>
+
+</div>
+</div>
+</div>
+</div>
+
+<div class="jb_cell">
+
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<ol>
+<li><a href="#cond_dens_def"><strong>Conditional distributions</strong></a></li>
+<li><a href="#pipe"><strong>Conditioning with |</strong></a></li>
+<li><a href="#event"><strong>Conditioning events</strong></a></li>
+<li><a href="#combine"><strong>Conditioning on multiple events</strong></a></li>
+<li><a href="#outcome"><strong>Conditioning on events in a probability space</strong></a></li>
+<li><a href="#continuous"><strong>Conditioning on the value of a continuous RV</strong></a></li>
+<li><a href="#conditional"><strong>Specifying a joint distribution via conditional and marginal distributions</strong></a></li>
+</ol>
+
+</div>
+</div>
+</div>
+</div>
+
+<div class="jb_cell">
+
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>Be sure to import Symbulate using the following commands.</p>
+
+</div>
+</div>
+</div>
+</div>
+
+<div class="jb_cell">
+
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="kn">from</span> <span class="nn">symbulate</span> <span class="k">import</span> <span class="o">*</span>
+<span class="o">%</span><span class="k">matplotlib</span> inline
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+</div>
+
+<div class="jb_cell">
+
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p><a id='cond_dens_def'></a></p>
+
+</div>
+</div>
+</div>
+</div>
+
+<div class="jb_cell">
+
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h3 id="Conditional-distributions">Conditional distributions<a class="anchor-link" href="#Conditional-distributions"> </a></h3><p>We are often interested in the <em>conditional distribution</em> of some random variables <em>given</em> the values of other random variables.  For example, if $X$ represents height (inches) and $Y$ represents weight (pounds) for some population, then the conditional distribution of $X$ given $Y=150$ would represent the distribution of heights only for those in the population who weigh 150 pounds.</p>
+<p>In principle, the conditional distribution of $X$ given $Y=y^*$ (where $y^*$ is a particular value, like 150 in the above example) can be simulated by (1) generating many $(x,y)$ pairs according to the joint distribution of $X$ and $Y$, (2) discarding all pairs for which $y\neq y^*$, and (3) summarizing the distribution of $x$ values for the pairs that remain.</p>
+
+</div>
+</div>
+</div>
+</div>
+
+<div class="jb_cell">
+
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p><a id='pipe'></a></p>
+
+</div>
+</div>
+</div>
+</div>
+
+<div class="jb_cell">
+
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h3 id="Conditioning-with-|">Conditioning with |<a class="anchor-link" href="#Conditioning-with-|"> </a></h3><p>In Symbulate, the process of conditioning can be accomplished directly using the vertical "pipe" symbol | (read "given")</p>
+<p><code>(X | (Y == 150)).sim(10000)</code></p>
+<p>We illustrate conditioning first with a simple detailed example.</p>
+
+</div>
+</div>
+</div>
+</div>
+
+<div class="jb_cell">
+
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p><em>Example.</em> A penny and a nickle are each flipped twice.  Let $X$ be the number of flips of the penny which land on heads, and $Y$ the number of flips the nickle lands on heads.  What is the probability that the penny lands on heads exactly once, given that 3 heads are flipped in total?</p>
+<p>First, $X$ and $Y$ will be independent, each with a Binomial(2, 0.5) distribution.</p>
+
+</div>
+</div>
+</div>
+</div>
+
+<div class="jb_cell">
+
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">X</span><span class="p">,</span> <span class="n">Y</span> <span class="o">=</span> <span class="n">RV</span><span class="p">(</span><span class="n">Binomial</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">)</span> <span class="o">**</span> <span class="mi">2</span><span class="p">)</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+</div>
+
+<div class="jb_cell">
+
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>The following simulates many $X, Y$ pairs.  Note that unconditionally there are 9 possible values.</p>
+
+</div>
+</div>
+</div>
+</div>
+
+<div class="jb_cell">
+
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="p">(</span><span class="n">X</span> <span class="o">&amp;</span> <span class="n">Y</span><span class="p">)</span><span class="o">.</span><span class="n">sim</span><span class="p">(</span><span class="mi">10000</span><span class="p">)</span><span class="o">.</span><span class="n">tabulate</span><span class="p">()</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="jb_output_wrapper }}">
+<div class="output_area">
+
+
+<div class="output_html rendered_html output_subarea output_execute_result">
+
+<table>
+  <thead>
+    <th width="80%">Outcome</th>
+    <th width="20%">Value</th>
+  </thead>
+  <tbody>
+    <tr><td>(0, 0)</td><td>639</td></tr><tr><td>(0, 1)</td><td>1198</td></tr><tr><td>(0, 2)</td><td>603</td></tr><tr><td>(1, 0)</td><td>1246</td></tr><tr><td>(1, 1)</td><td>2408</td></tr><tr><td>(1, 2)</td><td>1321</td></tr><tr><td>(2, 0)</td><td>584</td></tr><tr><td>(2, 1)</td><td>1353</td></tr><tr><td>(2, 2)</td><td>648</td></tr><tr><td><b>Total</b></td><td><b>10000</b></td></tr>
+  </tbody>
+</table>
+
+</div>
+
+</div>
+</div>
+</div>
+</div>
+
+</div>
+</div>
+
+<div class="jb_cell">
+
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>However, we only want to consider pairs for which $X+Y$ is 3.  We accomplish this through conditioning as in the following code.  Note</p>
+<ul>
+<li>There are only two possible outcomes for which $X+Y=3$, (2 heads for penny, 1 for nickle; 1 head for penny, 2 for nickle), and so conditioning on $X+Y=3$ should return only these outcomes.</li>
+<li>Simulating with <code>.sim()</code> when conditioning generates the specified number of values for which the conditioning event is true (i.e. 10000 $(X, Y)$ pairs for which the $X+Y = 3$.)</li>
+<li>The conditioning <a href="rv.html#RVevent">event</a>, <code>(X + Y == 3)</code>, is placed in parentheses</li>
+<li>The double equal sign <code>==</code> is used to check for equality</li>
+</ul>
+
+</div>
+</div>
+</div>
+</div>
+
+<div class="jb_cell">
+
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="p">((</span><span class="n">X</span> <span class="o">&amp;</span> <span class="n">Y</span><span class="p">)</span> <span class="o">|</span> <span class="p">(</span><span class="n">X</span> <span class="o">+</span> <span class="n">Y</span> <span class="o">==</span> <span class="mi">3</span><span class="p">))</span><span class="o">.</span><span class="n">sim</span><span class="p">(</span><span class="mi">10000</span><span class="p">)</span><span class="o">.</span><span class="n">tabulate</span><span class="p">()</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="jb_output_wrapper }}">
+<div class="output_area">
+
+
+<div class="output_html rendered_html output_subarea output_execute_result">
+
+<table>
+  <thead>
+    <th width="80%">Outcome</th>
+    <th width="20%">Value</th>
+  </thead>
+  <tbody>
+    <tr><td>(1, 2)</td><td>4955</td></tr><tr><td>(2, 1)</td><td>5045</td></tr><tr><td><b>Total</b></td><td><b>10000</b></td></tr>
+  </tbody>
+</table>
+
+</div>
+
+</div>
+</div>
+</div>
+</div>
+
+</div>
+</div>
+
+<div class="jb_cell">
+
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>The previous code illustrates the basic functionality of conditioning.  RVs and simulations with conditioning can be manipulated using the <a href="sim.html">simulation tools</a> just as those without conditioning.  For example, to find and plot the conditional distribution of $X$ given $X+Y=3$:</p>
+
+</div>
+</div>
+</div>
+</div>
+
+<div class="jb_cell">
+
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">x_given_y3</span> <span class="o">=</span> <span class="p">(</span><span class="n">X</span> <span class="o">|</span> <span class="p">(</span><span class="n">X</span> <span class="o">+</span> <span class="n">Y</span> <span class="o">==</span> <span class="mi">3</span><span class="p">))</span><span class="o">.</span><span class="n">sim</span><span class="p">(</span><span class="mi">10000</span><span class="p">)</span>
+<span class="n">x_given_y3</span><span class="o">.</span><span class="n">tabulate</span><span class="p">(</span><span class="n">normalize</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="jb_output_wrapper }}">
+<div class="output_area">
+
+
+<div class="output_html rendered_html output_subarea output_execute_result">
+
+<table>
+  <thead>
+    <th width="80%">Outcome</th>
+    <th width="20%">Value</th>
+  </thead>
+  <tbody>
+    <tr><td>1</td><td>0.5024</td></tr><tr><td>2</td><td>0.4976</td></tr><tr><td><b>Total</b></td><td><b>1.0</b></td></tr>
+  </tbody>
+</table>
+
+</div>
+
+</div>
+</div>
+</div>
+</div>
+
+</div>
+</div>
+
+<div class="jb_cell">
+
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">x_given_y3</span><span class="o">.</span><span class="n">plot</span><span class="p">()</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="jb_output_wrapper }}">
+<div class="output_area">
+
+
+
+<div class="output_png output_subarea ">
+<img src="images/conditioning_17_0.png"
+>
+</div>
+
+</div>
+</div>
+</div>
+</div>
+
+</div>
+</div>
+
+<div class="jb_cell">
+
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p><a id='event'></a></p>
+
+</div>
+</div>
+</div>
+</div>
+
+<div class="jb_cell">
+
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h3 id="Conditioning-events">Conditioning events<a class="anchor-link" href="#Conditioning-events"> </a></h3><p>Conditioning events must satisfy the following.</p>
+<ul>
+<li><strong>The conditioning event must be placed in parentheses.</strong></li>
+<li>The condition must involve at least one <code>RV</code>.  Remember that a function or transformation of <code>RV</code>s is also an <code>RV</code>.</li>
+<li>The conditioning event must involve a comparison operator: <code>==</code>, <code>&gt;</code>, <code>&lt;</code>, <code>&gt;=</code>, <code>&lt;=</code></li>
+</ul>
+<p><em>Example.</em> Memoryless property of Exponential distributions.</p>
+
+</div>
+</div>
+</div>
+</div>
+
+<div class="jb_cell">
+
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">X</span> <span class="o">=</span> <span class="n">RV</span><span class="p">(</span><span class="n">Exponential</span><span class="p">(</span><span class="mi">1</span><span class="p">))</span>
+<span class="p">(</span><span class="n">X</span> <span class="o">-</span> <span class="mi">5</span> <span class="o">|</span> <span class="p">(</span><span class="n">X</span> <span class="o">&gt;</span> <span class="mi">5</span><span class="p">))</span><span class="o">.</span><span class="n">sim</span><span class="p">(</span><span class="mi">10000</span><span class="p">)</span><span class="o">.</span><span class="n">plot</span><span class="p">()</span>
+<span class="n">RV</span><span class="p">(</span><span class="n">Exponential</span><span class="p">(</span><span class="mi">1</span><span class="p">))</span><span class="o">.</span><span class="n">sim</span><span class="p">(</span><span class="mi">10000</span><span class="p">)</span><span class="o">.</span><span class="n">plot</span><span class="p">()</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="jb_output_wrapper }}">
+<div class="output_area">
+
+
+
+<div class="output_png output_subarea ">
+<img src="images/conditioning_20_0.png"
+>
+</div>
+
+</div>
+</div>
+</div>
+</div>
+
+</div>
+</div>
+
+<div class="jb_cell">
+
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p><em>Example.</em> Soccer teams X and Y score goals independently of each other, and the number of goals each team scores has a Poisson distribution with mean 1 for X and mean 2 for Y.  Find the expected number of goals that team X scores given that they score at least as many goals as team Y.</p>
+
+</div>
+</div>
+</div>
+</div>
+
+<div class="jb_cell">
+
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">X</span><span class="p">,</span> <span class="n">Y</span> <span class="o">=</span> <span class="n">RV</span><span class="p">(</span><span class="n">Poisson</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span> <span class="o">*</span> <span class="n">Poisson</span><span class="p">(</span><span class="mi">2</span><span class="p">))</span>
+<span class="p">(</span><span class="n">X</span> <span class="o">|</span> <span class="p">(</span><span class="n">X</span> <span class="o">&gt;=</span> <span class="n">Y</span><span class="p">))</span><span class="o">.</span><span class="n">sim</span><span class="p">(</span><span class="mi">10000</span><span class="p">)</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="jb_output_wrapper }}">
+<div class="output_area">
+
+
+
+<div class="output_text output_subarea output_execute_result">
+<pre>1.6146</pre>
+</div>
+
+</div>
+</div>
+</div>
+</div>
+
+</div>
+</div>
+
+<div class="jb_cell">
+
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p><a id='combine'></a></p>
+
+</div>
+</div>
+</div>
+</div>
+
+<div class="jb_cell">
+
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h3 id="Conditioning-on-multiple-events">Conditioning on multiple events<a class="anchor-link" href="#Conditioning-on-multiple-events"> </a></h3><p>Multiple events can be conditioned on using the logical operators</p>
+<ul>
+<li><code>~</code> for not: <code>(~A)</code></li>
+<li><code>&amp;</code> for and: <code>(A &amp; B)</code> </li>
+<li><code>|</code> for or: <code>(A | B)</code>.  <strong>Caution: be sure to put parentheses around the conditioning events to avoid confusion between | for conditioning and | for or.</strong></li>
+</ul>
+
+</div>
+</div>
+</div>
+</div>
+
+<div class="jb_cell">
+
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p><em>Example.</em> Times between successive earthquakes are independent each having an Exponential distribution with mean 0.5 hour.  Find the conditional distribution of the time (starting now) until the next earthquake occurs, given that exactly 1 earthquake occurs in the next 2 hours.</p>
+<p>Let $X, Y$ be the times between the first two quakes, so that $X$ is the time of the first quake and $X+Y$ is the time of the second.  The event "exactly 1 quake in the next 2 hours" is equivalent to "the first quake occurs within 2 hours", i.e. $(X &lt; 2)$, AND the second quake occurs after 2 hours", i.e $(X + Y &gt;2)$.</p>
+
+</div>
+</div>
+</div>
+</div>
+
+<div class="jb_cell">
+
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">X</span><span class="p">,</span> <span class="n">Y</span> <span class="o">=</span> <span class="n">RV</span><span class="p">(</span><span class="n">Exponential</span><span class="p">(</span><span class="n">scale</span><span class="o">=</span><span class="mf">0.5</span><span class="p">)</span> <span class="o">**</span> <span class="mi">2</span><span class="p">)</span>
+<span class="p">(</span><span class="n">X</span> <span class="o">|</span> <span class="p">((</span><span class="n">X</span> <span class="o">&lt;</span> <span class="mi">2</span><span class="p">)</span> <span class="o">&amp;</span> <span class="p">(</span><span class="n">X</span> <span class="o">+</span> <span class="n">Y</span> <span class="o">&gt;</span> <span class="mi">2</span><span class="p">))</span> <span class="p">)</span><span class="o">.</span><span class="n">sim</span><span class="p">(</span><span class="mi">1000</span><span class="p">)</span><span class="o">.</span><span class="n">plot</span><span class="p">()</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="jb_output_wrapper }}">
+<div class="output_area">
+
+
+
+<div class="output_png output_subarea ">
+<img src="images/conditioning_26_0.png"
+>
+</div>
+
+</div>
+</div>
+</div>
+</div>
+
+</div>
+</div>
+
+<div class="jb_cell">
+
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p><a id='outcome'></a></p>
+
+</div>
+</div>
+</div>
+</div>
+
+<div class="jb_cell">
+
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h3 id="Conditioning-on-events-in-a-probability-space">Conditioning on events in a probability space<a class="anchor-link" href="#Conditioning-on-events-in-a-probability-space"> </a></h3><p>Symbulate allows for defining both <code>ProbabilitySpace</code>s and <code>RV</code>s.  Conditioning is only available for <code>RV</code>.  However, conditioning on events in a probability space can be accomplished by defining appropriate <code>RV</code>s and conditioning accordingly.  Note that while technically a random variable maps outcomes to real numbers, a Symbulate <code>RV</code> is not required to take numerical values.</p>
+<p><em>Example.</em> Three cards are dealt without replacement from a standard deck of 52 cards.  What is the conditional probability that the third card is a heart given that the first two cards are hearts? (Note that the true conditional probability  is $11/50 = 0.22$.)</p>
+
+</div>
+</div>
+</div>
+</div>
+
+<div class="jb_cell">
+
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">cards</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;clubs&#39;</span><span class="p">,</span> <span class="s1">&#39;diamonds&#39;</span><span class="p">,</span> <span class="s1">&#39;hearts&#39;</span><span class="p">,</span> <span class="s1">&#39;spades&#39;</span><span class="p">]</span> <span class="o">*</span> <span class="mi">13</span>  <span class="c1"># 13 cards of each suit</span>
+<span class="n">FirstCard</span><span class="p">,</span> <span class="n">SecondCard</span><span class="p">,</span> <span class="n">ThirdCard</span> <span class="o">=</span> <span class="n">RV</span><span class="p">(</span><span class="n">BoxModel</span><span class="p">(</span><span class="n">cards</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">replace</span><span class="o">=</span><span class="kc">False</span><span class="p">))</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+</div>
+
+<div class="jb_cell">
+
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>Note that <code>FirstCard</code> is an <code>RV</code>, but it takes non-numerical values (<code>'clubs'</code>, etc). The following conditions on the FirstCard and SecondCard RVs taking the value <code>'hearts'</code>.</p>
+
+</div>
+</div>
+</div>
+</div>
+
+<div class="jb_cell">
+
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="p">(</span><span class="n">FirstCard</span> <span class="o">&amp;</span> <span class="n">SecondCard</span> <span class="o">&amp;</span> <span class="n">ThirdCard</span> <span class="o">|</span> <span class="p">((</span><span class="n">FirstCard</span> <span class="o">==</span> <span class="s1">&#39;hearts&#39;</span><span class="p">)</span> <span class="o">&amp;</span> <span class="p">(</span><span class="n">SecondCard</span> <span class="o">==</span> <span class="s1">&#39;hearts&#39;</span><span class="p">))</span> <span class="p">)</span><span class="o">.</span><span class="n">sim</span><span class="p">(</span><span class="mi">10000</span><span class="p">)</span><span class="o">.</span><span class="n">tabulate</span><span class="p">()</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="jb_output_wrapper }}">
+<div class="output_area">
+
+
+<div class="output_html rendered_html output_subarea output_execute_result">
+
+<table>
+  <thead>
+    <th width="80%">Outcome</th>
+    <th width="20%">Value</th>
+  </thead>
+  <tbody>
+    <tr><td>(hearts, hearts, clubs)</td><td>2564</td></tr><tr><td>(hearts, hearts, diamonds)</td><td>2522</td></tr><tr><td>(hearts, hearts, hearts)</td><td>2212</td></tr><tr><td>(hearts, hearts, spades)</td><td>2702</td></tr><tr><td><b>Total</b></td><td><b>10000</b></td></tr>
+  </tbody>
+</table>
+
+</div>
+
+</div>
+</div>
+</div>
+</div>
+
+</div>
+</div>
+
+<div class="jb_cell">
+
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p><a id='continuous'></a></p>
+
+</div>
+</div>
+</div>
+</div>
+
+<div class="jb_cell">
+
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h3 id="Conditioning-on-the-value-of-a-continuous-RV">Conditioning on the value of a continuous RV<a class="anchor-link" href="#Conditioning-on-the-value-of-a-continuous-RV"> </a></h3><p>The probability that a continuous random variable equals any particular value is 0, so care must be taken when conditioning on the value of a continuous <code>RV</code>.  If $X$ is continuous, conditioning on the event $X = x$, which has probability 0, can be interpreted in various ways.  The simplest approach is to translate conditioning on $X=x$ as conditioning on values for which $X$ is "close to" $x$.</p>
+<p><em>Example.</em> $X, Y, Z$ have a multivariate normal distribution with mean vector and covariance matrix below.  Find the conditional distribution of $X$ given $Y=1$.</p>
+<p>We condition on $Y$ being within 0.01 of 1, using <code>(abs(Y - 1) &lt; 0.01)</code>.  Note that this conditioning event has probability 0.005, so even though the probability is non-zero, it will still take some time to generate enough repetitions satisfying the condition.</p>
+
+</div>
+</div>
+</div>
+</div>
+
+<div class="jb_cell">
+
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">mu</span> <span class="o">=</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">]</span>
+<span class="n">Sigma</span> <span class="o">=</span> <span class="p">[[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">2</span><span class="p">],</span>
+        <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span>
+        <span class="p">[</span><span class="o">-</span><span class="mi">2</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">9</span><span class="p">]]</span>
+<span class="n">X</span><span class="p">,</span> <span class="n">Y</span><span class="p">,</span> <span class="n">Z</span> <span class="o">=</span> <span class="n">RV</span><span class="p">(</span><span class="n">MultivariateNormal</span><span class="p">(</span><span class="n">mean</span><span class="o">=</span><span class="n">mu</span><span class="p">,</span> <span class="n">cov</span><span class="o">=</span><span class="n">Sigma</span><span class="p">))</span>
+
+<span class="p">(</span><span class="n">X</span> <span class="o">|</span> <span class="p">(</span><span class="nb">abs</span><span class="p">(</span><span class="n">Y</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mf">0.01</span><span class="p">))</span><span class="o">.</span><span class="n">sim</span><span class="p">(</span><span class="mi">1000</span><span class="p">)</span><span class="o">.</span><span class="n">plot</span><span class="p">()</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="jb_output_wrapper }}">
+<div class="output_area">
+
+
+
+<div class="output_png output_subarea ">
+<img src="images/conditioning_34_0.png"
+>
+</div>
+
+</div>
+</div>
+</div>
+</div>
+
+</div>
+</div>
+
+<div class="jb_cell">
+
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>We can also find the conditional joint distribution of $X$ and $Y$ given $Y=1$.</p>
+
+</div>
+</div>
+</div>
+</div>
+
+<div class="jb_cell">
+
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="p">(</span><span class="n">X</span> <span class="o">&amp;</span> <span class="n">Z</span> <span class="o">|</span> <span class="p">(</span><span class="nb">abs</span><span class="p">(</span><span class="n">Y</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mf">0.01</span><span class="p">))</span><span class="o">.</span><span class="n">sim</span><span class="p">(</span><span class="mi">1000</span><span class="p">)</span><span class="o">.</span><span class="n">plot</span><span class="p">()</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="jb_output_wrapper }}">
+<div class="output_area">
+
+
+
+<div class="output_png output_subarea ">
+<img src="images/conditioning_36_0.png"
+>
+</div>
+
+</div>
+</div>
+</div>
+</div>
+
+</div>
+</div>
+
+<div class="jb_cell">
+
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>In this example, $Y$ and $Z$ are independent.</p>
+
+</div>
+</div>
+</div>
+</div>
+
+<div class="jb_cell">
+
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">yz</span> <span class="o">=</span> <span class="p">(</span><span class="n">Y</span> <span class="o">&amp;</span> <span class="n">Z</span><span class="p">)</span><span class="o">.</span><span class="n">sim</span><span class="p">(</span><span class="mi">1000</span><span class="p">)</span>
+<span class="n">yz</span><span class="o">.</span><span class="n">plot</span><span class="p">()</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;The correlation coefficient of Y and Z is approximately </span><span class="si">{:.3f}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">yz</span><span class="o">.</span><span class="n">corr</span><span class="p">()))</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="jb_output_wrapper }}">
+<div class="output_area">
+
+<div class="output_subarea output_stream output_stdout output_text">
+<pre>The correlation coefficient of Y and Z is approximately -0.039
+</pre>
+</div>
+</div>
+</div>
+<div class="jb_output_wrapper }}">
+<div class="output_area">
+
+
+
+<div class="output_png output_subarea ">
+<img src="images/conditioning_38_1.png"
+>
+</div>
+
+</div>
+</div>
+</div>
+</div>
+
+</div>
+</div>
+
+<div class="jb_cell">
+
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>But $Y$ and $Z$ are not conditionally independent given $X = 2$.</p>
+
+</div>
+</div>
+</div>
+</div>
+
+<div class="jb_cell">
+
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">yz_given_x</span> <span class="o">=</span> <span class="p">(</span><span class="n">Y</span> <span class="o">&amp;</span> <span class="n">Z</span> <span class="o">|</span> <span class="p">(</span><span class="nb">abs</span><span class="p">(</span><span class="n">X</span> <span class="o">-</span> <span class="mi">2</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mf">0.01</span><span class="p">))</span><span class="o">.</span><span class="n">sim</span><span class="p">(</span><span class="mi">1000</span><span class="p">)</span>
+<span class="n">yz_given_x</span><span class="o">.</span><span class="n">plot</span><span class="p">()</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;The correlation coefficient of Y and Z given X equals 2 is approximately </span><span class="si">{:.3f}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">yz_given_x</span><span class="o">.</span><span class="n">corr</span><span class="p">()))</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="jb_output_wrapper }}">
+<div class="output_area">
+
+<div class="output_subarea output_stream output_stdout output_text">
+<pre>The correlation coefficient of Y and Z given X equals 2 is approximately 0.517
+</pre>
+</div>
+</div>
+</div>
+<div class="jb_output_wrapper }}">
+<div class="output_area">
+
+
+
+<div class="output_png output_subarea ">
+<img src="images/conditioning_40_1.png"
+>
+</div>
+
+</div>
+</div>
+</div>
+</div>
+
+</div>
+</div>
+
+<div class="jb_cell">
+
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p><a id='conditional'></a></p>
+
+</div>
+</div>
+</div>
+</div>
+
+<div class="jb_cell">
+
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h3 id="Specifying-a-joint-distribution-via-conditional-distribution-and-marginal-distributions">Specifying a joint distribution via conditional distribution and marginal distributions<a class="anchor-link" href="#Specifying-a-joint-distribution-via-conditional-distribution-and-marginal-distributions"> </a></h3><p>The joint distribution fully specifies the conditional and marginal distributions, and so conditioning can be used when the joint distribution is specified.  However, in many situations we specify a joint distribution indirectly by specifying appropriate conditional and marginal distributions.  Such a specification can be made in Symbulate using a custom <a href="probspace.html#probability_space"><code>ProbabilitySpace</code></a>.</p>
+
+</div>
+</div>
+</div>
+</div>
+
+<div class="jb_cell">
+
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p><em>Example.</em> Suppose that $X$ has a Uniform(0,1) distribution and that, given $X=x$, $Y$ has a Binomial(10, $x$) distribution.</p>
+<p>First define the joint distribution of $X$ and $Y$ using a custom probability space.  We first draw a value <code>x</code> from a Uniform(0,1) distribution.  Then we draw a value <code>y</code> from a Binomial(10, <code>x</code>) distributions.</p>
+
+</div>
+</div>
+</div>
+</div>
+
+<div class="jb_cell">
+
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="k">def</span> <span class="nf">binomial_given_uniform</span><span class="p">():</span>
+    <span class="n">x</span> <span class="o">=</span> <span class="n">Uniform</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">draw</span><span class="p">()</span>
+    <span class="n">y</span> <span class="o">=</span> <span class="n">Binomial</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="n">x</span><span class="p">)</span><span class="o">.</span><span class="n">draw</span><span class="p">()</span>
+    <span class="k">return</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span>
+
+<span class="n">X</span><span class="p">,</span> <span class="n">Y</span> <span class="o">=</span> <span class="n">RV</span><span class="p">(</span><span class="n">ProbabilitySpace</span><span class="p">(</span><span class="n">binomial_given_uniform</span><span class="p">))</span>
+
+<span class="p">(</span><span class="n">X</span> <span class="o">&amp;</span> <span class="n">Y</span><span class="p">)</span><span class="o">.</span><span class="n">sim</span><span class="p">(</span><span class="mi">10000</span><span class="p">)</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">jitter</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.1</span><span class="p">)</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="jb_output_wrapper }}">
+<div class="output_area">
+
+
+
+<div class="output_png output_subarea ">
+<img src="images/conditioning_44_0.png"
+>
+</div>
+
+</div>
+</div>
+</div>
+</div>
+
+</div>
+</div>
+
+<div class="jb_cell">
+
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>Use the joint distribution to simulate the conditional distribution of $Y$ given $X=0.3$ (and compare to Binomial(10, 0.3)).</p>
+
+</div>
+</div>
+</div>
+</div>
+
+<div class="jb_cell">
+
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="p">(</span><span class="n">Y</span> <span class="o">|</span> <span class="p">(</span><span class="nb">abs</span><span class="p">(</span><span class="n">X</span> <span class="o">-</span> <span class="mf">0.3</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mf">0.01</span><span class="p">)</span> <span class="p">)</span><span class="o">.</span><span class="n">sim</span><span class="p">(</span><span class="mi">100</span><span class="p">)</span><span class="o">.</span><span class="n">plot</span><span class="p">()</span>
+<span class="n">RV</span><span class="p">(</span><span class="n">Binomial</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mf">0.3</span><span class="p">))</span><span class="o">.</span><span class="n">sim</span><span class="p">(</span><span class="mi">1000</span><span class="p">)</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">jitter</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="jb_output_wrapper }}">
+<div class="output_area">
+
+
+
+<div class="output_png output_subarea ">
+<img src="images/conditioning_46_0.png"
+>
+</div>
+
+</div>
+</div>
+</div>
+</div>
+
+</div>
+</div>
+
+<div class="jb_cell">
+
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>Simulate the conditional distribution of $X$ given $Y=3$.</p>
+
+</div>
+</div>
+</div>
+</div>
+
+<div class="jb_cell">
+
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="p">(</span><span class="n">X</span> <span class="o">|</span> <span class="p">(</span><span class="n">Y</span> <span class="o">==</span> <span class="mi">3</span><span class="p">)</span> <span class="p">)</span><span class="o">.</span><span class="n">sim</span><span class="p">(</span><span class="mi">1000</span><span class="p">)</span><span class="o">.</span><span class="n">plot</span><span class="p">()</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="jb_output_wrapper }}">
+<div class="output_area">
+
+
+
+<div class="output_png output_subarea ">
+<img src="images/conditioning_48_0.png"
+>
+</div>
+
+</div>
+</div>
+</div>
+</div>
+
+</div>
+</div>
+
+ 
+
+
+    </main>
+    

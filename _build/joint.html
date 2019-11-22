@@ -1,0 +1,1760 @@
+---
+interact_link: content/joint.ipynb
+kernel_name: python3
+has_widgets: false
+title: |-
+  Use this!
+prev_page:
+  url: /common_joint.html
+  title: |-
+    Common Joint Models
+next_page:
+  url: /symobj.html
+  title: |-
+    Random Processes
+suffix: .ipynb
+
+comment: "***PROGRAMMATICALLY GENERATED, DO NOT EDIT. SEE ORIGINAL FILES IN /content***"
+---
+
+    <main class="jupyter-page">
+    
+<div class="jb_cell">
+
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h1 id="Multiple-Random-Variables-and-Joint-Distributions">Multiple Random Variables and Joint Distributions<a class="anchor-link" href="#Multiple-Random-Variables-and-Joint-Distributions"> </a></h1>
+</div>
+</div>
+</div>
+</div>
+
+<div class="jb_cell">
+
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p><a id='contents'></a></p>
+
+</div>
+</div>
+</div>
+</div>
+
+<div class="jb_cell">
+
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<ol>
+<li><a href="#def_mult_rand"><strong>Defining multiple random variables</strong></a></li>
+<li><a href="#ampersand"><strong>Simulating pairs (or tuples) of values with <code>&amp;</code></strong></a></li>
+<li><a href="#plot"><strong>Visualizing simulation results with <code>.plot()</code></strong></a></li>
+<li><a href="#common_joint_dist"><strong>Commonly used joint distributions</strong></a> </li>
+<li><a href="#def_ind_ran"><strong>Defining independent random variables</strong></a></li>
+<li><a href="#rv"><strong>Random vectors</strong></a></li>
+<li><a href="#unpack"><strong>"Unpacking"</strong></a></li>
+<li><a href="#marginal"><strong>Marginal distributions</strong></a></li>
+<li><a href="#cov"><strong>Covariance</strong></a></li>
+<li><a href="#corr"><strong>Correlation</strong></a></li>
+<li><a href="#transform"><strong>Transformations</strong></a></li>
+<li><a href="#caution"><strong>A caution about working with multiple random variables</strong></a></li>
+</ol>
+
+</div>
+</div>
+</div>
+</div>
+
+<div class="jb_cell">
+
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>Be sure to import Symbulate using the following commands.
+<a id='joint'></a></p>
+
+</div>
+</div>
+</div>
+</div>
+
+<div class="jb_cell">
+
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="kn">from</span> <span class="nn">symbulate</span> <span class="k">import</span> <span class="o">*</span>
+<span class="o">%</span><span class="k">matplotlib</span> inline
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+</div>
+
+<div class="jb_cell">
+
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p><a id='joint'></a></p>
+
+</div>
+</div>
+</div>
+</div>
+
+<div class="jb_cell">
+
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p><a id='def_mult_rand'></a></p>
+<h2 id="Defining-multiple-random-variables">Defining multiple random variables<a class="anchor-link" href="#Defining-multiple-random-variables"> </a></h2><p>Many problems involve several random variables defined on the same probability space.  Of interest are properties of the <em>joint distribution</em> which describe the relationship between the random variables.</p>
+<p>In the context of multiple random variables, the distribution of any single random variable is referred to as a <em>marginal distribution</em>.  Joint distributions fully specify the corresponding marginal distributions; however, the converse is not true (unless the random variables are independent.)</p>
+<p><em>Example.</em>  Roll two fair six-sided dice.  Let $X$ be the sum of the two dice and $Y$ the larger of the two rolls.</p>
+
+</div>
+</div>
+</div>
+</div>
+
+<div class="jb_cell">
+
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">die</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">6</span> <span class="o">+</span> <span class="mi">1</span><span class="p">))</span>
+<span class="n">P</span> <span class="o">=</span> <span class="n">BoxModel</span><span class="p">(</span><span class="n">die</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+<span class="n">X</span> <span class="o">=</span> <span class="n">RV</span><span class="p">(</span><span class="n">P</span><span class="p">,</span> <span class="nb">sum</span><span class="p">)</span>
+<span class="n">Y</span> <span class="o">=</span> <span class="n">RV</span><span class="p">(</span><span class="n">P</span><span class="p">,</span> <span class="nb">max</span><span class="p">)</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+</div>
+
+<div class="jb_cell">
+
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p><a id='ampersand'></a></p>
+
+</div>
+</div>
+</div>
+</div>
+
+<div class="jb_cell">
+
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h3 id="Simulating-pairs-(or-tuples)-of-values-with-&amp;">Simulating pairs (or tuples) of values with <code>&amp;</code><a class="anchor-link" href="#Simulating-pairs-(or-tuples)-of-values-with-&amp;"> </a></h3><p>Joining <code>X</code> and <code>Y</code> with an ampersand <code>&amp;</code>  and calling <code>.sim()</code> simultaneously simulates the pair of <code>(X, Y)</code> values for each simulated outcome of the probability space.  The simulated results can be used to approximate the joint distribution of <code>X</code> and <code>Y</code> which describes the possible pairs of values and their relative likelihoods.  Likewise, tuples of values of multiple random variables can be simulated simultaneously using the ampersand <code>&amp;</code>.  <a href="sim.html">Simulation tools</a> like <code>.sim()</code>, <code>.tabulate()</code>, etc work as before.</p>
+<p><em>Example.</em>  Roll two fair six-sided dice.  Let $X$ be the sum of the two dice and $Y$ the larger of the two rolls.</p>
+
+</div>
+</div>
+</div>
+</div>
+
+<div class="jb_cell">
+
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">die</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">6</span> <span class="o">+</span> <span class="mi">1</span><span class="p">))</span>
+<span class="n">P</span> <span class="o">=</span> <span class="n">BoxModel</span><span class="p">(</span><span class="n">die</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+<span class="n">X</span> <span class="o">=</span> <span class="n">RV</span><span class="p">(</span><span class="n">P</span><span class="p">,</span> <span class="nb">sum</span><span class="p">)</span>
+<span class="n">Y</span> <span class="o">=</span> <span class="n">RV</span><span class="p">(</span><span class="n">P</span><span class="p">,</span> <span class="nb">max</span><span class="p">)</span>
+<span class="p">(</span><span class="n">X</span> <span class="o">&amp;</span> <span class="n">Y</span><span class="p">)</span><span class="o">.</span><span class="n">sim</span><span class="p">(</span><span class="mi">10000</span><span class="p">)</span><span class="o">.</span><span class="n">tabulate</span><span class="p">(</span><span class="n">normalize</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="jb_output_wrapper }}">
+<div class="output_area">
+
+
+<div class="output_html rendered_html output_subarea output_execute_result">
+
+<table>
+  <thead>
+    <th width="80%">Outcome</th>
+    <th width="20%">Value</th>
+  </thead>
+  <tbody>
+    <tr><td>(2, 1)</td><td>0.0286</td></tr><tr><td>(3, 2)</td><td>0.0574</td></tr><tr><td>(4, 2)</td><td>0.0289</td></tr><tr><td>(4, 3)</td><td>0.0539</td></tr><tr><td>(5, 3)</td><td>0.0537</td></tr><tr><td>(5, 4)</td><td>0.0574</td></tr><tr><td>(6, 3)</td><td>0.0266</td></tr><tr><td>(6, 4)</td><td>0.0548</td></tr><tr><td>(6, 5)</td><td>0.0585</td></tr><tr><td>(7, 4)</td><td>0.0532</td></tr><tr><td>(7, 5)</td><td>0.0596</td></tr><tr><td>(7, 6)</td><td>0.051</td></tr><tr><td>(8, 4)</td><td>0.0253</td></tr><tr><td>(8, 5)</td><td>0.0582</td></tr><tr><td>(8, 6)</td><td>0.0562</td></tr><tr><td>(9, 5)</td><td>0.0565</td></tr><tr><td>(9, 6)</td><td>0.0542</td></tr><tr><td>(10, 5)</td><td>0.0274</td></tr><tr><td>(10, 6)</td><td>0.0541</td></tr><tr><td>...</td><td>...</td></tr><tr><td>(12, 6)</td><td>0.0278</td></tr><tr><td><b>Total</b></td><td><b>1.0</b></td></tr>
+  </tbody>
+</table>
+
+</div>
+
+</div>
+</div>
+</div>
+</div>
+
+</div>
+</div>
+
+<div class="jb_cell">
+
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p><a id='plot'></a></p>
+
+</div>
+</div>
+</div>
+</div>
+
+<div class="jb_cell">
+
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h3 id="Visualizing-simulation-results-with-.plot()">Visualizing simulation results with <code>.plot()</code><a class="anchor-link" href="#Visualizing-simulation-results-with-.plot()"> </a></h3><p>Calling <code>.plot()</code> for simulated <code>(X, Y)</code> pairs produces a <em>scatterplot</em> summary of the simulated values.  When the variables are discrete, it is recommended to use the <code>jitter=True</code> option to better visualize relative frequencies.  The <code>alpha=</code> parameter controls the level of transparency.</p>
+<p><em>Example.</em>  Roll two fair six-sided dice.  Let $X$ be the sum of the two dice and $Y$ the larger of the two rolls.</p>
+
+</div>
+</div>
+</div>
+</div>
+
+<div class="jb_cell">
+
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">die</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">6</span> <span class="o">+</span> <span class="mi">1</span><span class="p">))</span>
+<span class="n">P</span> <span class="o">=</span> <span class="n">BoxModel</span><span class="p">(</span><span class="n">die</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+<span class="n">X</span> <span class="o">=</span> <span class="n">RV</span><span class="p">(</span><span class="n">P</span><span class="p">,</span> <span class="nb">sum</span><span class="p">)</span>
+<span class="n">Y</span> <span class="o">=</span> <span class="n">RV</span><span class="p">(</span><span class="n">P</span><span class="p">,</span> <span class="nb">max</span><span class="p">)</span>
+<span class="p">(</span><span class="n">X</span> <span class="o">&amp;</span> <span class="n">Y</span><span class="p">)</span><span class="o">.</span><span class="n">sim</span><span class="p">(</span><span class="mi">10000</span><span class="p">)</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">jitter</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span> <span class="n">alpha</span> <span class="o">=</span> <span class="mf">0.01</span><span class="p">)</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="jb_output_wrapper }}">
+<div class="output_area">
+
+
+
+<div class="output_png output_subarea ">
+<img src="images/joint_13_0.png"
+>
+</div>
+
+</div>
+</div>
+</div>
+</div>
+
+</div>
+</div>
+
+<div class="jb_cell">
+
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>See the section on <a href="graphics.html">Symbulate graphics</a> for more details on plotting options and functionality.</p>
+
+</div>
+</div>
+</div>
+</div>
+
+<div class="jb_cell">
+
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p><a id='common_joint_dist'></a></p>
+<h2 id="Commonly-used-joint-distributions">Commonly used joint distributions<a class="anchor-link" href="#Commonly-used-joint-distributions"> </a></h2>
+</div>
+</div>
+</div>
+</div>
+
+<div class="jb_cell">
+
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>Recall that <a href="rv.html#distribution">a <code>RV</code> can be defined by specifying its distribution directly</a>.  Similarly, multiple <code>RV</code>s can be defined by specifying the joint distribution directly. Several commonly used <a href="common.html#joint">joint distributions</a> are built in to Symbulate.  For example, a <a href="common.html#mvn">multivariate normal distribution</a> is a joint distribution parametrized by a mean vector and a covariance matrix.</p>
+
+</div>
+</div>
+</div>
+</div>
+
+<div class="jb_cell">
+
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">covmatrix</span> <span class="o">=</span> <span class="p">[[</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.5</span><span class="p">],</span>
+             <span class="p">[</span><span class="o">-</span><span class="mf">0.5</span><span class="p">,</span> <span class="mi">4</span><span class="p">]]</span>
+<span class="n">X</span><span class="p">,</span> <span class="n">Y</span> <span class="o">=</span> <span class="n">RV</span><span class="p">(</span><span class="n">MultivariateNormal</span><span class="p">(</span><span class="n">mean</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span> <span class="n">cov</span> <span class="o">=</span> <span class="n">covmatrix</span><span class="p">))</span> <span class="c1"># see below for notes on &quot;unpacking&quot;</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+</div>
+
+<div class="jb_cell">
+
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>Custom joint distributions can be specified using <a href="probspace.html#probability_space">ProbabilitySpace</a>.  For example, it is possible to <a href="conditioning.html#conditional">specify a joint distribution via conditional and marginal distributions</a>.</p>
+
+</div>
+</div>
+</div>
+</div>
+
+<div class="jb_cell">
+
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p><a id='def_ind_ran'></a></p>
+<h2 id="Defining-independent-random-variables">Defining independent random variables<a class="anchor-link" href="#Defining-independent-random-variables"> </a></h2>
+</div>
+</div>
+</div>
+</div>
+
+<div class="jb_cell">
+
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>Intuitvely, a collection of random variables are independent if knowing the values of some does not influence the joint distribution of the others.  Random variables $X$ and $Y$ are <strong>independent</strong> if and only if the joint distribution factors into the product of the  corresponding marginal distributions.  That is, for independent RVs the joint distribution is fully specified by the marginal distributions.</p>
+<p>Recall that <a href="rv.html#distribution">a <code>RV</code> can be defined by specifying its distribution directly</a>.  When dealing with multiple random variables it is common to specify the marginal distribution of each and assume independence.  In Symbulate, independence of distributions is represented by the asterisks <code>*</code>.  The <code>*</code> syntax reflects that under independence joints objects (i.e. cdf, pdf) are products of the corresponding marginal objects.</p>
+<p><em>Example.</em> Let $X$, $Y$, and $Z$ be independent, with $X$ having a Binomial(5, 0.5) distribution, $Y$ a Normal(0,1) distribution, and $Z$ a Uniform(0,1) distribution.</p>
+
+</div>
+</div>
+</div>
+</div>
+
+<div class="jb_cell">
+
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">X</span><span class="p">,</span> <span class="n">Y</span><span class="p">,</span> <span class="n">Z</span> <span class="o">=</span> <span class="n">RV</span><span class="p">(</span><span class="n">Binomial</span><span class="p">(</span><span class="mi">5</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">)</span> <span class="o">*</span> <span class="n">Normal</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span> <span class="o">*</span> <span class="n">Uniform</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span>  <span class="c1"># see below for notes on &quot;unpacking&quot;</span>
+<span class="p">(</span><span class="n">X</span> <span class="o">&amp;</span> <span class="n">Y</span> <span class="o">&amp;</span> <span class="n">Z</span><span class="p">)</span><span class="o">.</span><span class="n">sim</span><span class="p">(</span><span class="mi">10000</span><span class="p">)</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="jb_output_wrapper }}">
+<div class="output_area">
+
+
+<div class="output_html rendered_html output_subarea output_execute_result">
+
+    <table>
+      <thead>
+        <th width="10%">Index</th>
+        <th width="90%">Result</th>
+      </thead>
+      <tbody>
+        
+        <tr>
+          <td>0</td><td>(2, -0.6027736499852608, 0.37206604884568517)</td>
+        </tr>
+        
+        <tr>
+          <td>1</td><td>(2, -0.4275860222383853, 0.4569055385370363)</td>
+        </tr>
+        
+        <tr>
+          <td>2</td><td>(1, 0.15526346946880312, 0.9712672434347334)</td>
+        </tr>
+        
+        <tr>
+          <td>3</td><td>(3, -1.3163450889685577, 0.6076184513236067)</td>
+        </tr>
+        
+        <tr>
+          <td>4</td><td>(3, -0.0328089274378655, 0.8343836468385954)</td>
+        </tr>
+        
+        <tr>
+          <td>5</td><td>(2, 0.5389112649637529, 0.20529729071052416)</td>
+        </tr>
+        
+        <tr>
+          <td>6</td><td>(1, 0.32128993163999925, 0.42263204518331254)</td>
+        </tr>
+        
+        <tr>
+          <td>7</td><td>(2, -0.832383503062737, 0.12099586542373231)</td>
+        </tr>
+        
+        <tr>
+          <td>8</td><td>(3, 0.8145959203095892, 0.2382660307823692)</td>
+        </tr>
+        <tr><td>...</td><td>...</td></tr>
+        <tr>
+          <td>9999</td><td>(3, 0.03818371315600435, 0.28040316406425403)</td>
+        </tr>
+        
+      </tbody>
+    </table>
+        
+</div>
+
+</div>
+</div>
+</div>
+</div>
+
+</div>
+</div>
+
+<div class="jb_cell">
+
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>The product syntax emphasizes that the random variables are defined on the same probability space (a product space).  It is also possible to define each random variable separately and then use the <code>AssumeIndependent</code> command.  The following code is equivalent to the above code.  Either syntax has the effect of creating an unspecified probability space upon which random variables $X, Y, Z$ are defined via unspecified functions such that $X$, $Y$, and $Z$ are independent and have the specified marginal distributions.</p>
+
+</div>
+</div>
+</div>
+</div>
+
+<div class="jb_cell">
+
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">X</span> <span class="o">=</span> <span class="n">RV</span><span class="p">(</span><span class="n">Binomial</span><span class="p">(</span><span class="mi">5</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">))</span>
+<span class="n">Y</span> <span class="o">=</span> <span class="n">RV</span><span class="p">(</span><span class="n">Normal</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span>
+<span class="n">Z</span> <span class="o">=</span> <span class="n">RV</span><span class="p">(</span><span class="n">Uniform</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span> 
+<span class="n">X</span><span class="p">,</span> <span class="n">Y</span><span class="p">,</span> <span class="n">Z</span> <span class="o">=</span> <span class="n">AssumeIndependent</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">Y</span><span class="p">,</span> <span class="n">Z</span><span class="p">)</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+</div>
+
+<div class="jb_cell">
+
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>Random variables are <strong>independent and identically distribution (i.i.d.)</strong> when they are independent and have a common marginal distribution.  For example, if <code>V</code> represents the number of heads in two flips of a penny and <code>W</code> the number of Heads in two flips of a dime, then <code>V</code> and <code>W</code> are i.i.d., with a common marginal <code>Binomial(n=2, p=0.5)</code> distribution.  For i.i.d. random variables, defining the joint distribution using the "exponentiation" notation <a href="probspace.html#Independent-probability-spaces"><code>**</code></a> makes the code a little more compact.</p>
+
+</div>
+</div>
+</div>
+</div>
+
+<div class="jb_cell">
+
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p><em>Example.</em> Let $X$ and $Y$ be i.i.d. Normal(0, 1) random variables.</p>
+
+</div>
+</div>
+</div>
+</div>
+
+<div class="jb_cell">
+
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">X</span><span class="p">,</span> <span class="n">Y</span> <span class="o">=</span> <span class="n">RV</span><span class="p">(</span><span class="n">Normal</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">)</span> <span class="o">**</span> <span class="mi">2</span><span class="p">)</span>  <span class="c1"># see below for notes on &quot;unpacking&quot;</span>
+<span class="p">(</span><span class="n">X</span> <span class="o">&amp;</span> <span class="n">Y</span><span class="p">)</span><span class="o">.</span><span class="n">sim</span><span class="p">(</span><span class="mi">10000</span><span class="p">)</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">alpha</span> <span class="o">=</span> <span class="mf">0.01</span><span class="p">)</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="jb_output_wrapper }}">
+<div class="output_area">
+
+
+
+<div class="output_png output_subarea ">
+<img src="images/joint_26_0.png"
+>
+</div>
+
+</div>
+</div>
+</div>
+</div>
+
+</div>
+</div>
+
+<div class="jb_cell">
+
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p><a id='rv'></a></p>
+
+</div>
+</div>
+</div>
+</div>
+
+<div class="jb_cell">
+
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h3 id="Random-vectors">Random vectors<a class="anchor-link" href="#Random-vectors"> </a></h3><p>Recall that a random variable maps an outcome in a probability space to a real number.  A <strong>random vector</strong> maps an outcome in a probability space to a vector of values.  In other words, a random vector is a vector of random variables.</p>
+<p>Each realization of a random vector is a tuple of values, rather than a single value. For example, a roll of two dice could return the pair of values (sum of the rolls, larger of the rolls).  The <code>RV</code> class can be used to define random vectors as well as random variables.</p>
+<p><em>Example.</em> Suppose that a random vector <code>X</code> is formed by drawing two values independently, the first from a Binomial(5, 0.5) distribution and the second from a Normal(0, 1) distribution.  Note that calling <code>.sim()</code> on <code>X</code> below generates pairs of values.</p>
+
+</div>
+</div>
+</div>
+</div>
+
+<div class="jb_cell">
+
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">X</span> <span class="o">=</span> <span class="n">RV</span><span class="p">(</span><span class="n">Binomial</span><span class="p">(</span><span class="mi">5</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">)</span> <span class="o">*</span> <span class="n">Normal</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span>
+<span class="n">X</span><span class="o">.</span><span class="n">sim</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="jb_output_wrapper }}">
+<div class="output_area">
+
+
+<div class="output_html rendered_html output_subarea output_execute_result">
+
+    <table>
+      <thead>
+        <th width="10%">Index</th>
+        <th width="90%">Result</th>
+      </thead>
+      <tbody>
+        
+        <tr>
+          <td>0</td><td>(3, 1.3773752166474593)</td>
+        </tr>
+        
+        <tr>
+          <td>1</td><td>(2, 2.3429281221952074)</td>
+        </tr>
+        
+        <tr>
+          <td>2</td><td>(4, -1.642702146251469)</td>
+        </tr>
+        
+      </tbody>
+    </table>
+        
+</div>
+
+</div>
+</div>
+</div>
+</div>
+
+</div>
+</div>
+
+<div class="jb_cell">
+
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>Components of a random vector X can be accessed using brackets <code>[]</code>.  Note that Python starts the index at 0, so the first entry of a vector <code>X</code> is <code>X[0]</code>, the second entry is <code>X[1]</code>, etc.  Each component of a random vector is a random variable so indexing using brackets produces a random variable which can be manipulated accordingly.</p>
+
+</div>
+</div>
+</div>
+</div>
+
+<div class="jb_cell">
+
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">X</span> <span class="o">=</span> <span class="n">RV</span><span class="p">(</span><span class="n">Binomial</span><span class="p">(</span><span class="mi">5</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">)</span> <span class="o">*</span> <span class="n">Normal</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span>
+<span class="n">X</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">sim</span><span class="p">(</span><span class="mi">10000</span><span class="p">)</span><span class="o">.</span><span class="n">plot</span><span class="p">()</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="jb_output_wrapper }}">
+<div class="output_area">
+
+
+
+<div class="output_png output_subarea ">
+<img src="images/joint_31_0.png"
+>
+</div>
+
+</div>
+</div>
+</div>
+</div>
+
+</div>
+</div>
+
+<div class="jb_cell">
+
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>Brackets can be used to access components of the random vector itself, or the simulated values of a random vector</p>
+
+</div>
+</div>
+</div>
+</div>
+
+<div class="jb_cell">
+
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">X</span> <span class="o">=</span> <span class="n">RV</span><span class="p">(</span><span class="n">Binomial</span><span class="p">(</span><span class="mi">5</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">)</span> <span class="o">*</span> <span class="n">Normal</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span>
+<span class="n">X</span><span class="o">.</span><span class="n">sim</span><span class="p">(</span><span class="mi">10000</span><span class="p">)[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">plot</span><span class="p">()</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="jb_output_wrapper }}">
+<div class="output_area">
+
+
+
+<div class="output_png output_subarea ">
+<img src="images/joint_33_0.png"
+>
+</div>
+
+</div>
+</div>
+</div>
+</div>
+
+</div>
+</div>
+
+<div class="jb_cell">
+
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>The ampersand <code>&amp;</code> can be used to join random variables defined on the same probability space into a random vector.</p>
+<p><em>Example.</em>  Roll two fair six-sided dice.  Let $X$ be the sum of the two dice and $Y$ the larger of the two rolls, and let $Z$ be the random vector $Z = (X, Y)$.</p>
+
+</div>
+</div>
+</div>
+</div>
+
+<div class="jb_cell">
+
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">die</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">6</span> <span class="o">+</span> <span class="mi">1</span><span class="p">))</span>
+<span class="n">P</span> <span class="o">=</span> <span class="n">BoxModel</span><span class="p">(</span><span class="n">die</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+<span class="n">X</span> <span class="o">=</span> <span class="n">RV</span><span class="p">(</span><span class="n">P</span><span class="p">,</span> <span class="nb">sum</span><span class="p">)</span>
+<span class="n">Y</span> <span class="o">=</span> <span class="n">RV</span><span class="p">(</span><span class="n">P</span><span class="p">,</span> <span class="nb">max</span><span class="p">)</span>
+
+<span class="n">Z</span> <span class="o">=</span> <span class="n">X</span> <span class="o">&amp;</span> <span class="n">Y</span>
+
+<span class="n">Z</span><span class="o">.</span><span class="n">sim</span><span class="p">(</span><span class="mi">5</span><span class="p">)</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="jb_output_wrapper }}">
+<div class="output_area">
+
+
+<div class="output_html rendered_html output_subarea output_execute_result">
+
+    <table>
+      <thead>
+        <th width="10%">Index</th>
+        <th width="90%">Result</th>
+      </thead>
+      <tbody>
+        
+        <tr>
+          <td>0</td><td>(9, 6)</td>
+        </tr>
+        
+        <tr>
+          <td>1</td><td>(8, 5)</td>
+        </tr>
+        
+        <tr>
+          <td>2</td><td>(7, 5)</td>
+        </tr>
+        
+        <tr>
+          <td>3</td><td>(5, 4)</td>
+        </tr>
+        
+        <tr>
+          <td>4</td><td>(8, 4)</td>
+        </tr>
+        
+      </tbody>
+    </table>
+        
+</div>
+
+</div>
+</div>
+</div>
+</div>
+
+</div>
+</div>
+
+<div class="jb_cell">
+
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="p">(</span><span class="n">X</span> <span class="o">&amp;</span> <span class="n">Z</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span><span class="o">.</span><span class="n">sim</span><span class="p">(</span><span class="mi">5</span><span class="p">)</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="jb_output_wrapper }}">
+<div class="output_area">
+
+
+<div class="output_html rendered_html output_subarea output_execute_result">
+
+    <table>
+      <thead>
+        <th width="10%">Index</th>
+        <th width="90%">Result</th>
+      </thead>
+      <tbody>
+        
+        <tr>
+          <td>0</td><td>(7, 7)</td>
+        </tr>
+        
+        <tr>
+          <td>1</td><td>(11, 11)</td>
+        </tr>
+        
+        <tr>
+          <td>2</td><td>(7, 7)</td>
+        </tr>
+        
+        <tr>
+          <td>3</td><td>(12, 12)</td>
+        </tr>
+        
+        <tr>
+          <td>4</td><td>(6, 6)</td>
+        </tr>
+        
+      </tbody>
+    </table>
+        
+</div>
+
+</div>
+</div>
+</div>
+</div>
+
+</div>
+</div>
+
+<div class="jb_cell">
+
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p><a id='unpack'></a></p>
+
+</div>
+</div>
+</div>
+</div>
+
+<div class="jb_cell">
+
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h3 id="&quot;Unpacking&quot;">"Unpacking"<a class="anchor-link" href="#&quot;Unpacking&quot;"> </a></h3><p>Individual components of a random vector X can be accessed using brackets, e.g. <code>X[0]</code>, <code>X[1]</code>, etc.  When a problem involves only a few random variables, it is typical to denote them as e.g. <code>X</code>, <code>Y</code>, <code>Z</code> (rather than <code>X[0]</code>, <code>X[1]</code>, <code>X[2]</code>).  Components of a random vector can be "unpacked" in this way when defining an RV, allowing for more compact syntax.</p>
+<p><em>Example.</em> Let $X$, $Y$, and $Z$ be independent, with $X$ having a Binomial(5, 0.5) distribution, $Y$ a Normal(0,1) distribution, and $Z$ a Uniform(0,1) distribution.  The following two cells provide two ways this situation can be defined.  The first version is the "unpacked" definition which defines the three random variables.  The second defines a random vector and then accesses each of its components with brackets.</p>
+
+</div>
+</div>
+</div>
+</div>
+
+<div class="jb_cell">
+
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># unpacked version</span>
+<span class="n">X</span><span class="p">,</span> <span class="n">Y</span><span class="p">,</span> <span class="n">Z</span> <span class="o">=</span> <span class="n">RV</span><span class="p">(</span><span class="n">Binomial</span><span class="p">(</span><span class="mi">5</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">)</span> <span class="o">*</span> <span class="n">Normal</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">)</span> <span class="o">*</span> <span class="n">Uniform</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">))</span>
+<span class="n">Y</span><span class="o">.</span><span class="n">sim</span><span class="p">(</span><span class="mi">10000</span><span class="p">)</span><span class="o">.</span><span class="n">plot</span><span class="p">()</span>
+<span class="p">(</span><span class="n">X</span> <span class="o">&amp;</span> <span class="n">Y</span> <span class="o">&amp;</span> <span class="n">Z</span><span class="p">)</span><span class="o">.</span><span class="n">sim</span><span class="p">(</span><span class="mi">4</span><span class="p">)</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="jb_output_wrapper }}">
+<div class="output_area">
+
+
+<div class="output_html rendered_html output_subarea output_execute_result">
+
+    <table>
+      <thead>
+        <th width="10%">Index</th>
+        <th width="90%">Result</th>
+      </thead>
+      <tbody>
+        
+        <tr>
+          <td>0</td><td>(3, -0.8820085190997768, 0.8725188862301262)</td>
+        </tr>
+        
+        <tr>
+          <td>1</td><td>(2, -0.6942545954953674, 0.5353290337579006)</td>
+        </tr>
+        
+        <tr>
+          <td>2</td><td>(2, 1.2847470309620233, 0.5476642083627794)</td>
+        </tr>
+        
+        <tr>
+          <td>3</td><td>(3, -0.6128467866054531, 0.8832702148291354)</td>
+        </tr>
+        
+      </tbody>
+    </table>
+        
+</div>
+
+</div>
+</div>
+<div class="jb_output_wrapper }}">
+<div class="output_area">
+
+
+
+<div class="output_png output_subarea ">
+<img src="images/joint_39_1.png"
+>
+</div>
+
+</div>
+</div>
+</div>
+</div>
+
+</div>
+</div>
+
+<div class="jb_cell">
+
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># vector version</span>
+<span class="n">XYZ</span> <span class="o">=</span> <span class="n">RV</span><span class="p">(</span><span class="n">Binomial</span><span class="p">(</span><span class="mi">5</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">)</span> <span class="o">*</span> <span class="n">Normal</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">)</span> <span class="o">*</span> <span class="n">Uniform</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">))</span>
+<span class="n">X</span> <span class="o">=</span> <span class="n">XYZ</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+<span class="n">Y</span> <span class="o">=</span> <span class="n">XYZ</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+<span class="n">Z</span> <span class="o">=</span> <span class="n">XYZ</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span>
+<span class="n">Y</span><span class="o">.</span><span class="n">sim</span><span class="p">(</span><span class="mi">10000</span><span class="p">)</span><span class="o">.</span><span class="n">plot</span><span class="p">()</span>
+<span class="n">XYZ</span><span class="o">.</span><span class="n">sim</span><span class="p">(</span><span class="mi">4</span><span class="p">)</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="jb_output_wrapper }}">
+<div class="output_area">
+
+
+<div class="output_html rendered_html output_subarea output_execute_result">
+
+    <table>
+      <thead>
+        <th width="10%">Index</th>
+        <th width="90%">Result</th>
+      </thead>
+      <tbody>
+        
+        <tr>
+          <td>0</td><td>(4, -1.0428058511986151, 0.648683136716311)</td>
+        </tr>
+        
+        <tr>
+          <td>1</td><td>(4, -1.1378236916507414, 0.2145393104078711)</td>
+        </tr>
+        
+        <tr>
+          <td>2</td><td>(3, -0.6497260814193432, 0.9109109126058534)</td>
+        </tr>
+        
+        <tr>
+          <td>3</td><td>(3, -0.11436956951348468, 0.48894459158255144)</td>
+        </tr>
+        
+      </tbody>
+    </table>
+        
+</div>
+
+</div>
+</div>
+<div class="jb_output_wrapper }}">
+<div class="output_area">
+
+
+
+<div class="output_png output_subarea ">
+<img src="images/joint_40_1.png"
+>
+</div>
+
+</div>
+</div>
+</div>
+</div>
+
+</div>
+</div>
+
+<div class="jb_cell">
+
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p><a id='marginal'></a></p>
+
+</div>
+</div>
+</div>
+</div>
+
+<div class="jb_cell">
+
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h3 id="Marginal-distributions">Marginal distributions<a class="anchor-link" href="#Marginal-distributions"> </a></h3><p>Each component of a random vector is a random variable, so unpacking or indexing using brackets produces random variables which can be manipulated accordingly to describe their marginal distribution.</p>
+<p>When multiple random variables are simulated, applying <code>.mean()</code>, <code>.var()</code>, or <code>.sd()</code> returns the marginal means, variances, and standard deviations, respectively, of each of the random variables involved.</p>
+
+</div>
+</div>
+</div>
+</div>
+
+<div class="jb_cell">
+
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p><em>Example.</em>  A vector of independent random variables.</p>
+
+</div>
+</div>
+</div>
+</div>
+
+<div class="jb_cell">
+
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">X</span> <span class="o">=</span> <span class="n">RV</span><span class="p">(</span><span class="n">Binomial</span><span class="p">(</span><span class="mi">5</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">)</span> <span class="o">*</span> <span class="n">Normal</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span> <span class="o">*</span> <span class="n">Poisson</span><span class="p">(</span><span class="mi">4</span><span class="p">))</span>
+<span class="n">X</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="o">.</span><span class="n">sim</span><span class="p">(</span><span class="mi">10000</span><span class="p">)</span><span class="o">.</span><span class="n">plot</span><span class="p">()</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="jb_output_wrapper }}">
+<div class="output_area">
+
+
+
+<div class="output_png output_subarea ">
+<img src="images/joint_44_0.png"
+>
+</div>
+
+</div>
+</div>
+</div>
+</div>
+
+</div>
+</div>
+
+<div class="jb_cell">
+
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">X</span><span class="o">.</span><span class="n">sim</span><span class="p">(</span><span class="mi">10000</span><span class="p">)</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="jb_output_wrapper }}">
+<div class="output_area">
+
+
+
+<div class="output_text output_subarea output_execute_result">
+<pre>(2.509, -0.007249895948954117, 4.0015)</pre>
+</div>
+
+</div>
+</div>
+</div>
+</div>
+
+</div>
+</div>
+
+<div class="jb_cell">
+
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">X</span><span class="o">.</span><span class="n">sim</span><span class="p">(</span><span class="mi">10000</span><span class="p">)</span><span class="o">.</span><span class="n">sd</span><span class="p">()</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="jb_output_wrapper }}">
+<div class="output_area">
+
+
+
+<div class="output_text output_subarea output_execute_result">
+<pre>(1.1279847472372944, 1.0039291445416711, 1.9710758077760724)</pre>
+</div>
+
+</div>
+</div>
+</div>
+</div>
+
+</div>
+</div>
+
+<div class="jb_cell">
+
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p><em>Example.</em> A <a href="common.html#mvn">multivariate normal</a> example, with "unpacking".</p>
+
+</div>
+</div>
+</div>
+</div>
+
+<div class="jb_cell">
+
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">covmatrix</span> <span class="o">=</span> <span class="p">[[</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.5</span><span class="p">],</span>
+             <span class="p">[</span><span class="o">-</span><span class="mf">0.5</span><span class="p">,</span> <span class="mi">4</span><span class="p">]]</span>
+<span class="n">X</span><span class="p">,</span> <span class="n">Y</span> <span class="o">=</span> <span class="n">RV</span><span class="p">(</span><span class="n">MultivariateNormal</span><span class="p">(</span><span class="n">mean</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span> <span class="n">cov</span> <span class="o">=</span> <span class="n">covmatrix</span><span class="p">))</span>
+<span class="n">xy</span> <span class="o">=</span> <span class="p">(</span><span class="n">X</span> <span class="o">&amp;</span> <span class="n">Y</span><span class="p">)</span><span class="o">.</span><span class="n">sim</span><span class="p">(</span><span class="mi">10000</span><span class="p">)</span>
+<span class="n">xy</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="jb_output_wrapper }}">
+<div class="output_area">
+
+
+
+<div class="output_text output_subarea output_execute_result">
+<pre>(0.0026913942111609413, 0.9861823423911262)</pre>
+</div>
+
+</div>
+</div>
+</div>
+</div>
+
+</div>
+</div>
+
+<div class="jb_cell">
+
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">xy</span><span class="o">.</span><span class="n">var</span><span class="p">()</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="jb_output_wrapper }}">
+<div class="output_area">
+
+
+
+<div class="output_text output_subarea output_execute_result">
+<pre>(0.9959332619981196, 4.028010152560529)</pre>
+</div>
+
+</div>
+</div>
+</div>
+</div>
+
+</div>
+</div>
+
+<div class="jb_cell">
+
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p><a id='cov'></a></p>
+
+</div>
+</div>
+</div>
+</div>
+
+<div class="jb_cell">
+
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h3 id="Covariance">Covariance<a class="anchor-link" href="#Covariance"> </a></h3><p>The <strong>covariance</strong> between random variables $X$ and $Y$, defined as
+$$
+Cov(X,Y) = E[(X-E(X))(Y-E(Y))],
+$$
+measures the degree of linear dependence between $X$ and $Y$.  Covariance can be approximated by simulating many pairs of values of the random variables and using <code>.cov()</code>.</p>
+<p><em>Example.</em>  Let $X$ be the minimum and $Y$ the maximum of two independent Uniform(0,1) random variables.  It can be shown that $Cov(X,Y) = 1/36$ (and the correlation is 1/2).</p>
+
+</div>
+</div>
+</div>
+</div>
+
+<div class="jb_cell">
+
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">P</span> <span class="o">=</span> <span class="n">Uniform</span><span class="p">(</span><span class="n">a</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">b</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span> <span class="o">**</span> <span class="mi">2</span>
+<span class="n">X</span> <span class="o">=</span> <span class="n">RV</span><span class="p">(</span><span class="n">P</span><span class="p">,</span> <span class="nb">min</span><span class="p">)</span>
+<span class="n">Y</span> <span class="o">=</span> <span class="n">RV</span><span class="p">(</span><span class="n">P</span><span class="p">,</span> <span class="nb">max</span><span class="p">)</span>
+<span class="n">xy</span> <span class="o">=</span> <span class="p">(</span><span class="n">X</span> <span class="o">&amp;</span> <span class="n">Y</span><span class="p">)</span><span class="o">.</span><span class="n">sim</span><span class="p">(</span><span class="mi">10000</span><span class="p">)</span>
+<span class="n">plot</span><span class="p">(</span><span class="n">xy</span><span class="p">,</span> <span class="n">alpha</span> <span class="o">=</span> <span class="mf">0.01</span><span class="p">)</span>
+<span class="n">xy</span><span class="o">.</span><span class="n">cov</span><span class="p">()</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="jb_output_wrapper }}">
+<div class="output_area">
+
+
+
+<div class="output_text output_subarea output_execute_result">
+<pre>0.02777717730655495</pre>
+</div>
+
+</div>
+</div>
+<div class="jb_output_wrapper }}">
+<div class="output_area">
+
+
+
+<div class="output_png output_subarea ">
+<img src="images/joint_52_1.png"
+>
+</div>
+
+</div>
+</div>
+</div>
+</div>
+
+</div>
+</div>
+
+<div class="jb_cell">
+
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p><em>Example.</em> A <a href="common.html#mvn">multivariate normal</a> example.</p>
+
+</div>
+</div>
+</div>
+</div>
+
+<div class="jb_cell">
+
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">covmatrix</span> <span class="o">=</span> <span class="p">[[</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.5</span><span class="p">],</span>
+             <span class="p">[</span><span class="o">-</span><span class="mf">0.5</span><span class="p">,</span> <span class="mi">4</span><span class="p">]]</span>
+<span class="n">X</span><span class="p">,</span> <span class="n">Y</span> <span class="o">=</span> <span class="n">RV</span><span class="p">(</span><span class="n">MultivariateNormal</span><span class="p">(</span><span class="n">mean</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span> <span class="n">cov</span><span class="o">=</span><span class="n">covmatrix</span><span class="p">))</span> <span class="c1"># see below for notes on &quot;unpacking&quot;</span>
+<span class="n">xy</span> <span class="o">=</span> <span class="p">(</span><span class="n">X</span> <span class="o">&amp;</span> <span class="n">Y</span><span class="p">)</span><span class="o">.</span><span class="n">sim</span><span class="p">(</span><span class="mi">10000</span><span class="p">)</span>
+<span class="n">xy</span><span class="o">.</span><span class="n">cov</span><span class="p">()</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="jb_output_wrapper }}">
+<div class="output_area">
+
+
+
+<div class="output_text output_subarea output_execute_result">
+<pre>-0.507678298407696</pre>
+</div>
+
+</div>
+</div>
+</div>
+</div>
+
+</div>
+</div>
+
+<div class="jb_cell">
+
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>When simulating more than two random variables, applying <code>.cov()</code> returns the <strong>covariance matrix</strong> of covariances between each pair of values (with the variances on the diagonal).</p>
+
+</div>
+</div>
+</div>
+</div>
+
+<div class="jb_cell">
+
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="p">(</span><span class="n">X</span> <span class="o">&amp;</span> <span class="n">Y</span> <span class="o">&amp;</span> <span class="n">X</span><span class="o">+</span><span class="n">Y</span><span class="p">)</span><span class="o">.</span><span class="n">sim</span><span class="p">(</span><span class="mi">10000</span><span class="p">)</span><span class="o">.</span><span class="n">cov</span><span class="p">()</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="jb_output_wrapper }}">
+<div class="output_area">
+
+
+
+<div class="output_text output_subarea output_execute_result">
+<pre>array([[ 0.99574916, -0.52471274,  0.47103642],
+       [-0.52471274,  3.97175643,  3.44704369],
+       [ 0.47103642,  3.44704369,  3.91808011]])</pre>
+</div>
+
+</div>
+</div>
+</div>
+</div>
+
+</div>
+</div>
+
+<div class="jb_cell">
+
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p><a id='corr'></a></p>
+
+</div>
+</div>
+</div>
+</div>
+
+<div class="jb_cell">
+
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h3 id="Correlation">Correlation<a class="anchor-link" href="#Correlation"> </a></h3><p>The <strong>correlation coefficient</strong> is a standardized measure of linear dependence which takes values in $[-1, 1]$.
+$$
+Corr(X,Y) = \frac{Cov (X,Y)}{\sqrt{Var(X)}\sqrt{Var(Y}} = Cov\left(\frac{X - E(X)}{SD(X)},\frac{Y - E(Y)}{SD(Y)}\right)
+$$
+The correlation coefficient can be approximated by simulating many pairs of values and  using <code>.corr()</code>.</p>
+
+</div>
+</div>
+</div>
+</div>
+
+<div class="jb_cell">
+
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p><em>Example.</em> A <a href="common.html#mvn">bivariate normal</a> example.</p>
+
+</div>
+</div>
+</div>
+</div>
+
+<div class="jb_cell">
+
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">X</span><span class="p">,</span> <span class="n">Y</span> <span class="o">=</span> <span class="n">RV</span><span class="p">(</span><span class="n">BivariateNormal</span><span class="p">(</span><span class="n">mean1</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">mean2</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">sd1</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">sd2</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">corr</span><span class="o">=-</span><span class="mf">0.25</span> <span class="p">))</span>
+<span class="n">xy</span> <span class="o">=</span> <span class="p">(</span><span class="n">X</span> <span class="o">&amp;</span> <span class="n">Y</span><span class="p">)</span><span class="o">.</span><span class="n">sim</span><span class="p">(</span><span class="mi">10000</span><span class="p">)</span>
+<span class="n">xy</span><span class="o">.</span><span class="n">corr</span><span class="p">()</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="jb_output_wrapper }}">
+<div class="output_area">
+
+
+
+<div class="output_text output_subarea output_execute_result">
+<pre>-0.2574815238793667</pre>
+</div>
+
+</div>
+</div>
+</div>
+</div>
+
+</div>
+</div>
+
+<div class="jb_cell">
+
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>When simulating more than two random variables, applying <code>.corr()</code> returns the <strong>correlation matrix</strong> of correlations between each pair of values (with 1s on the diagonal since a variable is perfectly correlated with itself).</p>
+
+</div>
+</div>
+</div>
+</div>
+
+<div class="jb_cell">
+
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="p">(</span><span class="n">X</span> <span class="o">&amp;</span> <span class="n">Y</span> <span class="o">&amp;</span> <span class="n">X</span><span class="o">+</span><span class="n">Y</span><span class="p">)</span><span class="o">.</span><span class="n">sim</span><span class="p">(</span><span class="mi">10000</span><span class="p">)</span><span class="o">.</span><span class="n">corr</span><span class="p">()</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="jb_output_wrapper }}">
+<div class="output_area">
+
+
+
+<div class="output_text output_subarea output_execute_result">
+<pre>array([[ 1.        , -0.24955397,  0.25710783],
+       [-0.24955397,  1.        ,  0.87164496],
+       [ 0.25710783,  0.87164496,  1.        ]])</pre>
+</div>
+
+</div>
+</div>
+</div>
+</div>
+
+</div>
+</div>
+
+<div class="jb_cell">
+
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p><a id='transform'></a></p>
+
+</div>
+</div>
+</div>
+</div>
+
+<div class="jb_cell">
+
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h3 id="Transformations-of-random-variables">Transformations of random variables<a class="anchor-link" href="#Transformations-of-random-variables"> </a></h3><p>Random variables are often defined as functions of other random variables.  In particular, arithmetic operations like addition, subtraction, multiplication, and division can be applied to random variables <em>defined on the same probability space</em>.</p>
+
+</div>
+</div>
+</div>
+</div>
+
+<div class="jb_cell">
+
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p><em>Example.</em> Two soccer teams score goals independently of each other, team A according to a Poisson distribution with mean 2.3 goals per goal and team B according to a Poisson distribution with mean 1.7 goals per game.  Produce a plot of the approximate distribution of the total number of goals scored in a game.</p>
+
+</div>
+</div>
+</div>
+</div>
+
+<div class="jb_cell">
+
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">X</span><span class="p">,</span> <span class="n">Y</span> <span class="o">=</span> <span class="n">RV</span><span class="p">(</span><span class="n">Poisson</span><span class="p">(</span><span class="n">lam</span><span class="o">=</span><span class="mf">2.3</span><span class="p">)</span> <span class="o">*</span> <span class="n">Poisson</span><span class="p">(</span><span class="n">lam</span><span class="o">=</span><span class="mf">1.7</span><span class="p">))</span>
+<span class="n">Z</span> <span class="o">=</span> <span class="n">X</span> <span class="o">+</span> <span class="n">Y</span>
+<span class="n">Z</span><span class="o">.</span><span class="n">sim</span><span class="p">(</span><span class="mi">10000</span><span class="p">)</span><span class="o">.</span><span class="n">plot</span><span class="p">()</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="jb_output_wrapper }}">
+<div class="output_area">
+
+
+
+<div class="output_png output_subarea ">
+<img src="images/joint_66_0.png"
+>
+</div>
+
+</div>
+</div>
+</div>
+</div>
+
+</div>
+</div>
+
+<div class="jb_cell">
+
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p><em>Example.</em> The coordinates of a "random point" in the $(x, y)$ plane are random variables $X$ and $Y$ chosen independently of each other, each according to a Normal(0, 1) distribution.  Produce a plot of the approximate distribution of $Z$, the distance of the $X, Y$ point from the origin.</p>
+
+</div>
+</div>
+</div>
+</div>
+
+<div class="jb_cell">
+
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">X</span><span class="p">,</span> <span class="n">Y</span> <span class="o">=</span> <span class="n">RV</span><span class="p">(</span><span class="n">Normal</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span> <span class="o">**</span> <span class="mi">2</span><span class="p">)</span>
+<span class="n">Z</span> <span class="o">=</span> <span class="n">sqrt</span><span class="p">(</span><span class="n">X</span> <span class="o">**</span> <span class="mi">2</span> <span class="o">+</span> <span class="n">Y</span> <span class="o">**</span> <span class="mi">2</span><span class="p">)</span>
+<span class="n">Z</span><span class="o">.</span><span class="n">sim</span><span class="p">(</span><span class="mi">10000</span><span class="p">)</span><span class="o">.</span><span class="n">plot</span><span class="p">()</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="jb_output_wrapper }}">
+<div class="output_area">
+
+
+
+<div class="output_png output_subarea ">
+<img src="images/joint_68_0.png"
+>
+</div>
+
+</div>
+</div>
+</div>
+</div>
+
+</div>
+</div>
+
+<div class="jb_cell">
+
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p><em>Example.</em> Let $X$ and $Y$ be i.i.d. Exponential(1) random variables.  Produce a plot of the approximate joint distribution of $W = X+ Y$ and $Z = X / W$.</p>
+
+</div>
+</div>
+</div>
+</div>
+
+<div class="jb_cell">
+
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">X</span><span class="p">,</span> <span class="n">Y</span> <span class="o">=</span> <span class="n">RV</span><span class="p">(</span><span class="n">Exponential</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span>
+<span class="n">W</span> <span class="o">=</span> <span class="n">X</span> <span class="o">+</span> <span class="n">Y</span>
+<span class="n">Z</span> <span class="o">=</span> <span class="n">X</span> <span class="o">/</span> <span class="n">W</span>
+<span class="p">(</span><span class="n">W</span> <span class="o">&amp;</span> <span class="n">Z</span><span class="p">)</span><span class="o">.</span><span class="n">sim</span><span class="p">(</span><span class="mi">10000</span><span class="p">)</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">alpha</span> <span class="o">=</span> <span class="mf">0.05</span><span class="p">)</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="jb_output_wrapper }}">
+<div class="output_area">
+
+
+
+<div class="output_png output_subarea ">
+<img src="images/joint_70_0.png"
+>
+</div>
+
+</div>
+</div>
+</div>
+</div>
+
+</div>
+</div>
+
+<div class="jb_cell">
+
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p><a id='caution'></a></p>
+<h2 id="A-caution-about-working-with-multiple-random-variables">A caution about working with multiple random variables<a class="anchor-link" href="#A-caution-about-working-with-multiple-random-variables"> </a></h2>
+</div>
+</div>
+</div>
+</div>
+
+<div class="jb_cell">
+
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>In order to manipulate multiple random variables simulultaneously, they must be defined on the sample probability space.  Otherwise, it would not be possible to determine the <em>relationship</em> between the random variables.  Note that the following code would produce an error because the random variables are not explicitly defined on the same probability space.  In particular, Symbulate has no way of determining the joint distribution of $X$ and $Y$.  The error can be fixed by adding <code>X, Y = AssumeIndependent(X, Y)</code> before the last line, after which the code would be equivalent to the code above in the soccer example above.</p>
+
+</div>
+</div>
+</div>
+</div>
+
+<div class="jb_cell">
+
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+
+<pre><code>X = RV(Poisson(2.3))  
+Y = RV(Poisson(1.7))  
+(X + Y).sim(10000).plot()</code></pre>
+
+</div>
+</div>
+</div>
+</div>
+
+<div class="jb_cell">
+
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>If it is desired to define <a href="#def_ind_ran"><em>independent</em> random variables</a>, the independence must be made explicit, either with the product syntax <code>*</code> (or <code>**</code>) or with <code>AssumeIndependent</code>.  (The <code>AssumeIndependent</code> command has the effect of defining the random variables involved on the same probability space, a product space formed from the marginal distributions.)</p>
+
+</div>
+</div>
+</div>
+</div>
+
+ 
+
+
+    </main>
+    

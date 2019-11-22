@@ -1,0 +1,1592 @@
+---
+interact_link: content/mc.ipynb
+kernel_name: python3
+has_widgets: false
+title: |-
+  Markov Processes
+prev_page:
+  url: /common_random.html
+  title: |-
+    Common Random Processes
+next_page:
+  url: 
+  title: |-
+    
+suffix: .ipynb
+
+comment: "***PROGRAMMATICALLY GENERATED, DO NOT EDIT. SEE ORIGINAL FILES IN /content***"
+---
+
+    <main class="jupyter-page">
+    
+<div class="jb_cell">
+
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h1 id="Markov-Processes">Markov Processes<a class="anchor-link" href="#Markov-Processes"> </a></h1>
+</div>
+</div>
+</div>
+</div>
+
+<div class="jb_cell">
+
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p><a id='mc'></a></p>
+
+</div>
+</div>
+</div>
+</div>
+
+<div class="jb_cell">
+
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>Random processes are typically collections of <em>dependent</em> random variables, but allowing arbitrary associations between values at different points in time makes analysis intractable.  <em>Markov processes</em> are stochastic processes which obey a specific kind of "next step" dependence structure.  For a Markov process, roughly speaking, given the present, the future is conditionally independent of the past.  The dependence assumption in Markov chains allows for a rich
+theory and tractable probabilistic models that have applications in a wide range of situations.</p>
+
+</div>
+</div>
+</div>
+</div>
+
+<div class="jb_cell">
+
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p><a id='contents'></a></p>
+
+</div>
+</div>
+</div>
+</div>
+
+<div class="jb_cell">
+
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<ol>
+<li><a href="#dtmc"><strong>Discrete time Markov chains</strong></a></li>
+<li><a href="#ctmc"><strong>Continuous time Markov chains</strong></a></li>
+<li><a href="#poisson"><strong>Poisson processes</strong></a></li>
+<li><a href="#brownian"><strong>Brownian motion</strong></a></li>
+<li><a href="#mcprobspace"><strong>Markov process probability spaces</strong></a></li>
+<li><a href="#times"><strong>Arrival and jump times</strong></a></li>
+</ol>
+
+</div>
+</div>
+</div>
+</div>
+
+<div class="jb_cell">
+
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>Be sure to import Symbulate using the following commands.</p>
+
+</div>
+</div>
+</div>
+</div>
+
+<div class="jb_cell">
+
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="kn">from</span> <span class="nn">symbulate</span> <span class="k">import</span> <span class="o">*</span>
+<span class="o">%</span><span class="k">matplotlib</span> inline
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+</div>
+
+<div class="jb_cell">
+
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p><a id='dtmc'></a></p>
+
+</div>
+</div>
+</div>
+</div>
+
+<div class="jb_cell">
+
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h3 id="Discrete-time-Markov-chains">Discrete time Markov chains<a class="anchor-link" href="#Discrete-time-Markov-chains"> </a></h3>
+</div>
+</div>
+</div>
+</div>
+
+<div class="jb_cell">
+
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>A <strong>discrete time Markov chain</strong> is a discrete time, discrete state <a href="process.html">random process</a> which satisfies for all $n$:</p>
+<p>Given $X_n$ ("the present"), $(X_{n+1}, X_{n+2}, \ldots)$ ("the future") is conditionally independent of $(X_{n-1}, X_{n-2}, \ldots, X_0)$ ("the past").</p>
+<p>In Symbulate a discrete time Markov chain is defined with <code>MarkovChain</code>.  The probabilistic behavior of a discrete time Markov chain is fully specified by the following, which are the parameters of <code>MarkovChain</code>.</p>
+<ul>
+<li><code>state_labels</code>: The <strong>state space</strong> of possible values of the process.  (Default is to label the states 0, 1, 2, ...)</li>
+<li><code>initial_dist</code>: The <strong>initial distribution</strong>, which specifies the probability distribution at time 0</li>
+<li><code>transition_matrix</code>: The (one-step) <strong>transition probability matrix</strong>, whose $(i, j)$  entry specifies the probability that the chain is in state $j$ at the next time step given that it is currently in state $i$: $P(X_{n+1} = j\, | X_n = i)$.  All rows sums must be 1.</li>
+</ul>
+<p><em>Example.</em> The weather in a certain city can be classified as either cloudy, rainy, or sunny and follows a discrete time Markov chain.</p>
+<ul>
+<li>Given that it is cloudy today, tomorrow it will be cloudy with probability 0.3, rainy with probability 0.2, or sunny with probability 0.5.</li>
+<li>Given that it is rainy today, tomorrow it will be cloudy with probability 0.5, rainy with probability 0.3, or sunny with probability 0.2.</li>
+<li>Given that it is sunny today, tomorrow it will be cloudy with probability 0.3, rainy with probability 0, or sunny with probability 0.7.</li>
+</ul>
+<p>Suppose that it is sunny on Sunday.  (So we'll call Sunday $n=0$.)</p>
+
+</div>
+</div>
+</div>
+</div>
+
+<div class="jb_cell">
+
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">states</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;cloud&quot;</span><span class="p">,</span> <span class="s2">&quot;rain&quot;</span><span class="p">,</span> <span class="s2">&quot;sun&quot;</span><span class="p">]</span>
+
+<span class="n">TransitionMatrix</span> <span class="o">=</span> <span class="p">[[</span><span class="mf">0.3</span><span class="p">,</span> <span class="mf">0.2</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">],</span>
+                   <span class="p">[</span><span class="mf">0.5</span><span class="p">,</span> <span class="mf">0.3</span><span class="p">,</span> <span class="mf">0.2</span><span class="p">],</span>
+                   <span class="p">[</span><span class="mf">0.3</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.7</span><span class="p">]]</span>
+
+<span class="n">InitialDistribution</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span> <span class="c1"># sunny on Sunday</span>
+
+<span class="n">X</span> <span class="o">=</span> <span class="n">MarkovChain</span><span class="p">(</span><span class="n">TransitionMatrix</span><span class="p">,</span> <span class="n">InitialDistribution</span><span class="p">,</span> <span class="n">states</span><span class="p">)</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+</div>
+
+<div class="jb_cell">
+
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>Find the probability that it is rainy on Friday ($n=5$).</p>
+
+</div>
+</div>
+</div>
+</div>
+
+<div class="jb_cell">
+
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">X</span><span class="p">[</span><span class="mi">5</span><span class="p">]</span><span class="o">.</span><span class="n">sim</span><span class="p">(</span><span class="mi">10000</span><span class="p">)</span><span class="o">.</span><span class="n">tabulate</span><span class="p">(</span><span class="n">normalize</span> <span class="o">=</span> <span class="kc">True</span><span class="p">)</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="jb_output_wrapper }}">
+<div class="output_area">
+
+
+<div class="output_html rendered_html output_subarea output_execute_result">
+
+<table>
+  <thead>
+    <th width="80%">Outcome</th>
+    <th width="20%">Value</th>
+  </thead>
+  <tbody>
+    <tr><td>cloud</td><td>0.3233</td></tr><tr><td>rain</td><td>0.0949</td></tr><tr><td>sun</td><td>0.5818</td></tr><tr><td><b>Total</b></td><td><b>1.0</b></td></tr>
+  </tbody>
+</table>
+
+</div>
+
+</div>
+</div>
+</div>
+</div>
+
+</div>
+</div>
+
+<div class="jb_cell">
+
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>Find the conditional probability that it is rainy on Friday given that it is rainy on Thursday.  (The following should return, approximately, the second row of the transition matrix.)</p>
+
+</div>
+</div>
+</div>
+</div>
+
+<div class="jb_cell">
+
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="p">(</span><span class="n">X</span><span class="p">[</span><span class="mi">5</span><span class="p">]</span> <span class="o">|</span> <span class="p">(</span><span class="n">X</span><span class="p">[</span><span class="mi">4</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;rain&quot;</span><span class="p">))</span><span class="o">.</span><span class="n">sim</span><span class="p">(</span><span class="mi">10000</span><span class="p">)</span><span class="o">.</span><span class="n">tabulate</span><span class="p">(</span><span class="n">normalize</span> <span class="o">=</span> <span class="kc">True</span><span class="p">)</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="jb_output_wrapper }}">
+<div class="output_area">
+
+
+<div class="output_html rendered_html output_subarea output_execute_result">
+
+<table>
+  <thead>
+    <th width="80%">Outcome</th>
+    <th width="20%">Value</th>
+  </thead>
+  <tbody>
+    <tr><td>cloud</td><td>0.5</td></tr><tr><td>rain</td><td>0.3028</td></tr><tr><td>sun</td><td>0.1972</td></tr><tr><td><b>Total</b></td><td><b>1.0</b></td></tr>
+  </tbody>
+</table>
+
+</div>
+
+</div>
+</div>
+</div>
+</div>
+
+</div>
+</div>
+
+<div class="jb_cell">
+
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>Find the conditional probability that it is rainy on Friday given that it is rainy on Thursday and cloudy on Wednesday.  (This demonstrates the Markov property: conditioning additionally on the value of $X_3$ does not change the conditional distribution from the previous part.)</p>
+
+</div>
+</div>
+</div>
+</div>
+
+<div class="jb_cell">
+
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="p">(</span><span class="n">X</span><span class="p">[</span><span class="mi">5</span><span class="p">]</span> <span class="o">|</span> <span class="p">((</span><span class="n">X</span><span class="p">[</span><span class="mi">4</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;rain&quot;</span><span class="p">)</span> <span class="o">&amp;</span> <span class="p">(</span><span class="n">X</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;cloud&quot;</span><span class="p">)))</span><span class="o">.</span><span class="n">sim</span><span class="p">(</span><span class="mi">10000</span><span class="p">)</span><span class="o">.</span><span class="n">tabulate</span><span class="p">(</span><span class="n">normalize</span> <span class="o">=</span> <span class="kc">True</span><span class="p">)</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="jb_output_wrapper }}">
+<div class="output_area">
+
+
+<div class="output_html rendered_html output_subarea output_execute_result">
+
+<table>
+  <thead>
+    <th width="80%">Outcome</th>
+    <th width="20%">Value</th>
+  </thead>
+  <tbody>
+    <tr><td>cloud</td><td>0.4981</td></tr><tr><td>rain</td><td>0.3043</td></tr><tr><td>sun</td><td>0.1976</td></tr><tr><td><b>Total</b></td><td><b>1.0</b></td></tr>
+  </tbody>
+</table>
+
+</div>
+
+</div>
+</div>
+</div>
+</div>
+
+</div>
+</div>
+
+<div class="jb_cell">
+
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>Find the probability that it is rainy on Friday and Saturday.</p>
+
+</div>
+</div>
+</div>
+</div>
+
+<div class="jb_cell">
+
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="p">(</span><span class="n">X</span><span class="p">[</span><span class="mi">5</span><span class="p">]</span> <span class="o">&amp;</span> <span class="n">X</span><span class="p">[</span><span class="mi">6</span><span class="p">])</span><span class="o">.</span><span class="n">sim</span><span class="p">(</span><span class="mi">10000</span><span class="p">)</span><span class="o">.</span><span class="n">tabulate</span><span class="p">(</span><span class="n">normalize</span> <span class="o">=</span> <span class="kc">True</span><span class="p">)</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="jb_output_wrapper }}">
+<div class="output_area">
+
+
+<div class="output_html rendered_html output_subarea output_execute_result">
+
+<table>
+  <thead>
+    <th width="80%">Outcome</th>
+    <th width="20%">Value</th>
+  </thead>
+  <tbody>
+    <tr><td>(cloud, cloud)</td><td>0.094</td></tr><tr><td>(cloud, rain)</td><td>0.063</td></tr><tr><td>(cloud, sun)</td><td>0.1602</td></tr><tr><td>(rain, cloud)</td><td>0.0431</td></tr><tr><td>(rain, rain)</td><td>0.0236</td></tr><tr><td>(rain, sun)</td><td>0.0187</td></tr><tr><td>(sun, cloud)</td><td>0.1829</td></tr><tr><td>(sun, sun)</td><td>0.4145</td></tr><tr><td><b>Total</b></td><td><b>1.0</b></td></tr>
+  </tbody>
+</table>
+
+</div>
+
+</div>
+</div>
+</div>
+</div>
+
+</div>
+</div>
+
+<div class="jb_cell">
+
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h4 id="State-labels">State labels<a class="anchor-link" href="#State-labels"> </a></h4><p>The state space can be any list of values (like ['cloud', 'rain', 'sun']).  If <code>state_labels</code> are not specified, the default is to label the states 0, 1, 2, ...  When the states are numerical values, plots can be created, and methods like <code>.mean()</code> and <code>.sd()</code> can be applied.</p>
+
+</div>
+</div>
+</div>
+</div>
+
+<div class="jb_cell">
+
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">TransitionMatrix</span> <span class="o">=</span> <span class="p">[[</span><span class="mf">0.3</span><span class="p">,</span> <span class="mf">0.2</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">],</span>
+                   <span class="p">[</span><span class="mf">0.5</span><span class="p">,</span> <span class="mf">0.3</span><span class="p">,</span> <span class="mf">0.2</span><span class="p">],</span>
+                   <span class="p">[</span><span class="mf">0.3</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.7</span><span class="p">]]</span>
+
+<span class="n">InitialDistribution</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span> <span class="c1"># sunny on Sunday</span>
+
+<span class="n">X</span> <span class="o">=</span> <span class="n">MarkovChain</span><span class="p">(</span><span class="n">TransitionMatrix</span><span class="p">,</span> <span class="n">InitialDistribution</span><span class="p">)</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+</div>
+
+<div class="jb_cell">
+
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">X</span><span class="o">.</span><span class="n">sim</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">alpha</span> <span class="o">=</span> <span class="mi">1</span><span class="p">)</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="jb_output_wrapper }}">
+<div class="output_area">
+
+
+
+<div class="output_png output_subarea ">
+<img src="images/mc_21_0.png"
+>
+</div>
+
+</div>
+</div>
+</div>
+</div>
+
+</div>
+</div>
+
+<div class="jb_cell">
+
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">X</span><span class="o">.</span><span class="n">sim</span><span class="p">(</span><span class="mi">10</span><span class="p">)</span><span class="o">.</span><span class="n">plot</span><span class="p">()</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="jb_output_wrapper }}">
+<div class="output_area">
+
+
+
+<div class="output_png output_subarea ">
+<img src="images/mc_22_0.png"
+>
+</div>
+
+</div>
+</div>
+</div>
+</div>
+
+</div>
+</div>
+
+<div class="jb_cell">
+
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">X</span><span class="p">[</span><span class="mi">5</span><span class="p">]</span><span class="o">.</span><span class="n">sim</span><span class="p">(</span><span class="mi">10000</span><span class="p">)</span><span class="o">.</span><span class="n">plot</span><span class="p">()</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="jb_output_wrapper }}">
+<div class="output_area">
+
+
+
+<div class="output_png output_subarea ">
+<img src="images/mc_23_0.png"
+>
+</div>
+
+</div>
+</div>
+</div>
+</div>
+
+</div>
+</div>
+
+<div class="jb_cell">
+
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="p">(</span><span class="n">X</span><span class="p">[</span><span class="mi">5</span><span class="p">]</span> <span class="o">|</span> <span class="p">(</span><span class="n">X</span><span class="p">[</span><span class="mi">4</span><span class="p">]</span> <span class="o">==</span> <span class="mi">1</span><span class="p">)</span> <span class="p">)</span><span class="o">.</span><span class="n">sim</span><span class="p">(</span><span class="mi">10000</span><span class="p">)</span><span class="o">.</span><span class="n">plot</span><span class="p">()</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="jb_output_wrapper }}">
+<div class="output_area">
+
+
+
+<div class="output_png output_subarea ">
+<img src="images/mc_24_0.png"
+>
+</div>
+
+</div>
+</div>
+</div>
+</div>
+
+</div>
+</div>
+
+<div class="jb_cell">
+
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="p">(</span><span class="n">X</span><span class="p">[</span><span class="mi">4</span><span class="p">]</span> <span class="o">&amp;</span> <span class="n">X</span><span class="p">[</span><span class="mi">5</span><span class="p">])</span><span class="o">.</span><span class="n">sim</span><span class="p">(</span><span class="mi">10000</span><span class="p">)</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">jitter</span> <span class="o">=</span> <span class="kc">True</span><span class="p">)</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="jb_output_wrapper }}">
+<div class="output_area">
+
+
+
+<div class="output_png output_subarea ">
+<img src="images/mc_25_0.png"
+>
+</div>
+
+</div>
+</div>
+</div>
+</div>
+
+</div>
+</div>
+
+<div class="jb_cell">
+
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p><a id='ctmc'></a></p>
+
+</div>
+</div>
+</div>
+</div>
+
+<div class="jb_cell">
+
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h3 id="Continuous-time-Markov-chains">Continuous time Markov chains<a class="anchor-link" href="#Continuous-time-Markov-chains"> </a></h3>
+</div>
+</div>
+</div>
+</div>
+
+<div class="jb_cell">
+
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>A <strong>continuous time Markov chain</strong> is a continuous time, discrete state <a href="process.html">random process</a> which satisfies for all $t$:</p>
+<p>Given $X_t$ ("the present"), $(X_{u},u \ge t)$ ("the future") is conditionally independent of $(X_{s}, s \le t )$ ("the past").</p>
+<p>In a discrete time Markov chain, state transitions occur at every point in time, $n = 0, 1, 2, \ldots$.  A continuous time Markov chain behaves like a discrete time Markov chain in which the times between state transitions are independent and exponentially distributed.</p>
+<ul>
+<li>The amount of time a chain stays in a state has an exponential distribution, with a rate parameter that can depend on the current state.</li>
+<li>When the chain "jumps" to a new state, the jumps behave like a discrete time Markov chain.</li>
+<li>The times between jumps are independent.</li>
+</ul>
+<p>In Symbulate a continuous time Markov chain is defined with <code>ContinuousTimeMarkovChain</code>.  The probabilistic behavior of a continuous time Markov chain is fully specified by the following, which are the parameters of <code>ContinuousMarkovChain</code>.</p>
+<ul>
+<li><code>state_labels</code>: The <strong>state space</strong> of possible values of the process.  (Default is to label the states 0, 1, 2, ...)</li>
+<li><code>initial_dist</code>: The <strong>initial distribution</strong>, which specifies the probability distribution at time 0</li>
+<li><code>generator_matrix</code>: The <strong>generator matrix</strong> or <strong>transition rate matrix</strong>, $Q$, whose $(i, j)$  entry specifies the rate at which the chain "attempts to transition" to state $j$ given that it is currently in state $i$.<ul>
+<li>For small $h$, $P(X_{t+h} = j\, | X_t = i) \approx h q(i,j)$</li>
+<li>The total departure rate from states $i$ is $\lambda(i) = \sum_{j\neq i} q(i,j)$</li>
+<li>The diagonal entries are the $-1$ times the total departure rates from each state, $q(i,i) = -\lambda(i)$, so that the all row sums are 0.</li>
+<li>The probability that when the chain departs state $i$ it jumps to state $j$ is $q(i,j)/\lambda(i)$.</li>
+</ul>
+</li>
+</ul>
+
+</div>
+</div>
+</div>
+</div>
+
+<div class="jb_cell">
+
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p><em>Example.</em> The weather in a certain city can be classified as either cloudy, rainy, or sunny and follows a continuous time Markov chain.</p>
+<ul>
+<li>Given that it is cloudy currently, it will next be rainy with probability 0.3, or sunny with probability 0.7.</li>
+<li>Given that it is rainy currently, it will next be cloudy with probability 0.6 or sunny with probability 0.4.</li>
+<li>Given that it is sunny currently, it will next be cloudy with probability 1.</li>
+<li>On average it stays cloudy for 2 days, rainy for 1 day, and sunny for 3 days.</li>
+</ul>
+<p>Suppose that it is currently sunny.</p>
+
+</div>
+</div>
+</div>
+</div>
+
+<div class="jb_cell">
+
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">states</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;cloud&quot;</span><span class="p">,</span> <span class="s2">&quot;rain&quot;</span><span class="p">,</span> <span class="s2">&quot;sun&quot;</span><span class="p">]</span>
+
+<span class="n">Q</span> <span class="o">=</span> <span class="p">[[</span><span class="o">-</span><span class="mf">0.50</span><span class="p">,</span> <span class="mf">0.15</span><span class="p">,</span> <span class="mf">0.35</span><span class="p">],</span>
+     <span class="p">[</span> <span class="mf">0.60</span><span class="p">,</span>   <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mf">0.40</span><span class="p">],</span>
+     <span class="p">[</span>  <span class="mi">1</span><span class="o">/</span><span class="mi">3</span><span class="p">,</span>  <span class="mf">0.0</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="o">/</span><span class="mi">3</span><span class="p">]]</span>
+
+<span class="n">InitialDistribution</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span> <span class="c1"># sunny currently</span>
+
+<span class="n">X</span> <span class="o">=</span> <span class="n">ContinuousTimeMarkovChain</span><span class="p">(</span><span class="n">Q</span><span class="p">,</span> <span class="n">InitialDistribution</span><span class="p">,</span> <span class="n">states</span><span class="p">)</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+</div>
+
+<div class="jb_cell">
+
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>If it is currently sunny, find the probability that it is raining 36 hours from now.</p>
+
+</div>
+</div>
+</div>
+</div>
+
+<div class="jb_cell">
+
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">X</span><span class="p">[</span><span class="mf">1.5</span><span class="p">]</span><span class="o">.</span><span class="n">sim</span><span class="p">(</span><span class="mi">10000</span><span class="p">)</span><span class="o">.</span><span class="n">tabulate</span><span class="p">(</span><span class="n">normalize</span> <span class="o">=</span> <span class="kc">True</span><span class="p">)</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="jb_output_wrapper }}">
+<div class="output_area">
+
+
+<div class="output_html rendered_html output_subarea output_execute_result">
+
+<table>
+  <thead>
+    <th width="80%">Outcome</th>
+    <th width="20%">Value</th>
+  </thead>
+  <tbody>
+    <tr><td>cloud</td><td>0.286</td></tr><tr><td>rain</td><td>0.022</td></tr><tr><td>sun</td><td>0.692</td></tr><tr><td><b>Total</b></td><td><b>1.0</b></td></tr>
+  </tbody>
+</table>
+
+</div>
+
+</div>
+</div>
+</div>
+</div>
+
+</div>
+</div>
+
+<div class="jb_cell">
+
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>Given that it is raining 36 hours from now, find the probability that it is sunny 48 hours from now.</p>
+
+</div>
+</div>
+</div>
+</div>
+
+<div class="jb_cell">
+
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="p">(</span><span class="n">X</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">|</span> <span class="p">(</span><span class="n">X</span><span class="p">[</span><span class="mf">1.5</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;rain&quot;</span><span class="p">))</span><span class="o">.</span><span class="n">sim</span><span class="p">(</span><span class="mi">10000</span><span class="p">)</span><span class="o">.</span><span class="n">tabulate</span><span class="p">(</span><span class="n">normalize</span> <span class="o">=</span> <span class="kc">True</span><span class="p">)</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="jb_output_wrapper }}">
+<div class="output_area">
+
+
+<div class="output_html rendered_html output_subarea output_execute_result">
+
+<table>
+  <thead>
+    <th width="80%">Outcome</th>
+    <th width="20%">Value</th>
+  </thead>
+  <tbody>
+    <tr><td>cloud</td><td>0.2281</td></tr><tr><td>rain</td><td>0.6067</td></tr><tr><td>sun</td><td>0.1652</td></tr><tr><td><b>Total</b></td><td><b>1.0</b></td></tr>
+  </tbody>
+</table>
+
+</div>
+
+</div>
+</div>
+</div>
+</div>
+
+</div>
+</div>
+
+<div class="jb_cell">
+
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h4 id="State-labels">State labels<a class="anchor-link" href="#State-labels"> </a></h4><p>As for discrete time Markov chains, the state space for a continuous time Markov chain can be any list of values (like ['cloud', 'rain', 'sun']).  If <code>state_labels</code> are not specified, the default is to label the states 0, 1, 2, ...  When the states are numerical values, plots can be created, and methods like <code>.mean()</code> and <code>.sd()</code> can be applied.</p>
+
+</div>
+</div>
+</div>
+</div>
+
+<div class="jb_cell">
+
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">Q</span> <span class="o">=</span> <span class="p">[[</span><span class="o">-</span><span class="mf">0.50</span><span class="p">,</span> <span class="mf">0.15</span><span class="p">,</span> <span class="mf">0.35</span><span class="p">],</span>
+     <span class="p">[</span> <span class="mf">0.60</span><span class="p">,</span>   <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mf">0.40</span><span class="p">],</span>
+     <span class="p">[</span>  <span class="mi">1</span><span class="o">/</span><span class="mi">3</span><span class="p">,</span>  <span class="mf">0.0</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="o">/</span><span class="mi">3</span><span class="p">]]</span>
+
+
+<span class="n">InitialDistribution</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span> <span class="c1"># sunny currently</span>
+
+<span class="n">X</span> <span class="o">=</span> <span class="n">ContinuousTimeMarkovChain</span><span class="p">(</span><span class="n">Q</span><span class="p">,</span> <span class="n">InitialDistribution</span><span class="p">)</span>
+
+<span class="n">X</span><span class="o">.</span><span class="n">sim</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">alpha</span> <span class="o">=</span> <span class="mi">1</span><span class="p">)</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="jb_output_wrapper }}">
+<div class="output_area">
+
+
+
+<div class="output_png output_subarea ">
+<img src="images/mc_36_0.png"
+>
+</div>
+
+</div>
+</div>
+</div>
+</div>
+
+</div>
+</div>
+
+<div class="jb_cell">
+
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p><a id='poisson'></a></p>
+
+</div>
+</div>
+</div>
+</div>
+
+<div class="jb_cell">
+
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h3 id="Poisson-processes">Poisson processes<a class="anchor-link" href="#Poisson-processes"> </a></h3><p>Events occurs over time according to a <strong>Poisson process</strong> $N(t), t\ge0$, with rate $\lambda$ if at most one event occurs at a time, the times between events are indepent and exponentially distributed with rate $\lambda$, and $N(t)$ counts the number of events that occur in the time interval $[0,t]$ (with $N(0) = 0$).  In other words, a Poisson process is a continuous time Markov chain whose rate matrix $Q$ satisfies
+$$
+q(i, j) =
+\begin{cases}
+\lambda, &amp; j = i+1,\\
+-\lambda, &amp; j = i,\\
+0, &amp; \text{otherwise.}
+\end{cases}
+$$</p>
+<p>In Symbulate, <code>PoissonProcess</code> defines a Poisson process; the single parameter is <code>rate</code>.</p>
+
+</div>
+</div>
+</div>
+</div>
+
+<div class="jb_cell">
+
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p><em>Example.</em> Customers arrive according a Poisson process with rate 2 per minute.</p>
+
+</div>
+</div>
+</div>
+</div>
+
+<div class="jb_cell">
+
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">N</span> <span class="o">=</span> <span class="n">PoissonProcess</span><span class="p">(</span><span class="n">rate</span> <span class="o">=</span> <span class="mi">2</span><span class="p">)</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+</div>
+
+<div class="jb_cell">
+
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>Simulate and plot a single sample path, and find the process value for this sample path at time 4</p>
+
+</div>
+</div>
+</div>
+</div>
+
+<div class="jb_cell">
+
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">n</span> <span class="o">=</span> <span class="n">N</span><span class="o">.</span><span class="n">sim</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+<span class="n">n</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">alpha</span> <span class="o">=</span> <span class="mi">1</span><span class="p">)</span>
+<span class="n">n</span><span class="p">[</span><span class="mi">4</span><span class="p">]</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="jb_output_wrapper }}">
+<div class="output_area">
+
+
+<div class="output_html rendered_html output_subarea output_execute_result">
+
+    <table>
+      <thead>
+        <th width="10%">Index</th>
+        <th width="90%">Result</th>
+      </thead>
+      <tbody>
+        
+        <tr>
+          <td>0</td><td>11</td>
+        </tr>
+        
+      </tbody>
+    </table>
+        
+</div>
+
+</div>
+</div>
+<div class="jb_output_wrapper }}">
+<div class="output_area">
+
+
+
+<div class="output_png output_subarea ">
+<img src="images/mc_42_1.png"
+>
+</div>
+
+</div>
+</div>
+</div>
+</div>
+
+</div>
+</div>
+
+<div class="jb_cell">
+
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>Simulate many sample paths and plot the mean function</p>
+
+</div>
+</div>
+</div>
+</div>
+
+<div class="jb_cell">
+
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">sims</span> <span class="o">=</span> <span class="n">N</span><span class="o">.</span><span class="n">sim</span><span class="p">(</span><span class="mi">100</span><span class="p">)</span>
+<span class="n">sims</span><span class="o">.</span><span class="n">plot</span><span class="p">()</span>
+<span class="n">sims</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span><span class="o">.</span><span class="n">plot</span><span class="p">()</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="jb_output_wrapper }}">
+<div class="output_area">
+
+
+
+<div class="output_png output_subarea ">
+<img src="images/mc_44_0.png"
+>
+</div>
+
+</div>
+</div>
+</div>
+</div>
+
+</div>
+</div>
+
+<div class="jb_cell">
+
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>Approximate the distribution of $N(3)$, the number of customers who arrive in the first 3 minutes, and its mean and variance.  (Should be Poisson(6).)</p>
+
+</div>
+</div>
+</div>
+</div>
+
+<div class="jb_cell">
+
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">sims</span> <span class="o">=</span> <span class="n">N</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span><span class="o">.</span><span class="n">sim</span><span class="p">(</span><span class="mi">10000</span><span class="p">)</span>
+<span class="n">sims</span><span class="o">.</span><span class="n">plot</span><span class="p">()</span>
+<span class="n">sims</span><span class="o">.</span><span class="n">mean</span><span class="p">(),</span> <span class="n">sims</span><span class="o">.</span><span class="n">var</span><span class="p">()</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="jb_output_wrapper }}">
+<div class="output_area">
+
+
+
+<div class="output_text output_subarea output_execute_result">
+<pre>(5.9961, 6.051084789999999)</pre>
+</div>
+
+</div>
+</div>
+<div class="jb_output_wrapper }}">
+<div class="output_area">
+
+
+
+<div class="output_png output_subarea ">
+<img src="images/mc_46_1.png"
+>
+</div>
+
+</div>
+</div>
+</div>
+</div>
+
+</div>
+</div>
+
+<div class="jb_cell">
+
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p><a id='mcprobspace'></a></p>
+
+</div>
+</div>
+</div>
+</div>
+
+<div class="jb_cell">
+
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h3 id="Markov-chain-probability-spaces">Markov chain probability spaces<a class="anchor-link" href="#Markov-chain-probability-spaces"> </a></h3><p>The examples above illustrate methods for simulating paths of discrete and continuous time Markov chains and process values at specific time points.  However, there are many other random quantities associated with a random process that may be of interest.  Such random quantities can be investigated by first defining a probability space on which all related random processes and random variables are defined.  Symbulate includes probability spaces upon which Markov chains and related quantities can be defined.</p>
+<p>The following example defines a probability space which supports the weather chain from above.</p>
+
+</div>
+</div>
+</div>
+</div>
+
+<div class="jb_cell">
+
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">states</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;cloud&quot;</span><span class="p">,</span> <span class="s2">&quot;rain&quot;</span><span class="p">,</span> <span class="s2">&quot;sun&quot;</span><span class="p">]</span>
+
+<span class="n">TransitionMatrix</span> <span class="o">=</span> <span class="p">[[</span><span class="mf">0.3</span><span class="p">,</span> <span class="mf">0.2</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">],</span>
+                   <span class="p">[</span><span class="mf">0.5</span><span class="p">,</span> <span class="mf">0.3</span><span class="p">,</span> <span class="mf">0.2</span><span class="p">],</span>
+                   <span class="p">[</span><span class="mf">0.3</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.7</span><span class="p">]]</span>
+
+<span class="n">InitialDistribution</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span> <span class="c1"># sunny on Sunday</span>
+
+<span class="n">P</span> <span class="o">=</span> <span class="n">MarkovChainProbabilitySpace</span><span class="p">(</span><span class="n">TransitionMatrix</span><span class="p">,</span> <span class="n">InitialDistribution</span><span class="p">,</span> <span class="n">states</span><span class="p">)</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+</div>
+
+<div class="jb_cell">
+
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>A Markov chain can then be defined as a (sequence of) <code>RV</code> on this probability space.</p>
+
+</div>
+</div>
+</div>
+</div>
+
+<div class="jb_cell">
+
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">X</span> <span class="o">=</span> <span class="n">RV</span><span class="p">(</span><span class="n">P</span><span class="p">)</span>
+
+<span class="n">X</span><span class="o">.</span><span class="n">sim</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">plot</span><span class="p">()</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="jb_output_wrapper }}">
+<div class="output_area">
+
+
+
+<div class="output_png output_subarea ">
+<img src="images/mc_51_0.png"
+>
+</div>
+
+</div>
+</div>
+</div>
+</div>
+
+</div>
+</div>
+
+<div class="jb_cell">
+
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>Symbulate also contains probability spaces supporting continuous time Markov chains</p>
+
+</div>
+</div>
+</div>
+</div>
+
+<div class="jb_cell">
+
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p><a id='times'></a></p>
+
+</div>
+</div>
+</div>
+</div>
+
+<div class="jb_cell">
+
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h3 id="Arrival-and-jump-times">Arrival and jump times<a class="anchor-link" href="#Arrival-and-jump-times"> </a></h3><p>For continuous time Markov chains (including Poisson processes) the times between jumps (or arrivals) and the times of the jumps themselves are random variables.  These random times can be accessed with <code>.JumpTimes()</code> or <code>InterjumpTimes()</code>.  The jump times and interjump times are sequences; individual components can be accessed with brackets, e.g. <code>.JumpTimes()[1]</code> for the time of the first jump.</p>
+<p>The sequences of states the chain visits can be accessed with <code>.States()</code>.</p>
+
+</div>
+</div>
+</div>
+</div>
+
+<div class="jb_cell">
+
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p><em>Example</em>.  Continuing the weather example.</p>
+
+</div>
+</div>
+</div>
+</div>
+
+<div class="jb_cell">
+
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">states</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;cloud&quot;</span><span class="p">,</span> <span class="s2">&quot;rain&quot;</span><span class="p">,</span> <span class="s2">&quot;sun&quot;</span><span class="p">]</span>
+
+<span class="n">Q</span> <span class="o">=</span> <span class="p">[[</span><span class="o">-</span><span class="mf">0.50</span><span class="p">,</span> <span class="mf">0.15</span><span class="p">,</span> <span class="mf">0.35</span><span class="p">],</span>
+     <span class="p">[</span> <span class="mf">0.60</span><span class="p">,</span>   <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mf">0.40</span><span class="p">],</span>
+     <span class="p">[</span>  <span class="mi">1</span><span class="o">/</span><span class="mi">3</span><span class="p">,</span>  <span class="mf">0.0</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="o">/</span><span class="mi">3</span><span class="p">]]</span>
+
+
+<span class="n">InitialDistribution</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span> <span class="c1"># sunny currently</span>
+
+<span class="n">X</span> <span class="o">=</span> <span class="n">ContinuousTimeMarkovChain</span><span class="p">(</span><span class="n">Q</span><span class="p">,</span> <span class="n">InitialDistribution</span><span class="p">,</span> <span class="n">states</span><span class="p">)</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+</div>
+
+<div class="jb_cell">
+
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>Simulate the jump times for one sample path.</p>
+
+</div>
+</div>
+</div>
+</div>
+
+<div class="jb_cell">
+
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">X</span><span class="o">.</span><span class="n">JumpTimes</span><span class="p">()</span><span class="o">.</span><span class="n">sim</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="jb_output_wrapper }}">
+<div class="output_area">
+
+<div class="output_subarea output_text output_error">
+<pre>
+<span class="ansi-red-intense-fg ansi-bold">---------------------------------------------------------------------------</span>
+<span class="ansi-red-intense-fg ansi-bold">AttributeError</span>                            Traceback (most recent call last)
+<span class="ansi-green-intense-fg ansi-bold">&lt;ipython-input-23-9fc285f5e42f&gt;</span> in <span class="ansi-cyan-fg">&lt;module&gt;</span><span class="ansi-blue-intense-fg ansi-bold">()</span>
+<span class="ansi-green-intense-fg ansi-bold">----&gt; 1</span><span class="ansi-yellow-intense-fg ansi-bold"> </span>X<span class="ansi-yellow-intense-fg ansi-bold">.</span>JumpTimes<span class="ansi-yellow-intense-fg ansi-bold">(</span><span class="ansi-yellow-intense-fg ansi-bold">)</span><span class="ansi-yellow-intense-fg ansi-bold">.</span>sim<span class="ansi-yellow-intense-fg ansi-bold">(</span><span class="ansi-cyan-intense-fg ansi-bold">1</span><span class="ansi-yellow-intense-fg ansi-bold">)</span>
+
+<span class="ansi-red-intense-fg ansi-bold">AttributeError</span>: &#39;ContinuousTimeMarkovChain&#39; object has no attribute &#39;JumpTimes&#39;</pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+
+</div>
+</div>
+
+<div class="jb_cell">
+
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>Simulate the state sequence for one sample path.</p>
+
+</div>
+</div>
+</div>
+</div>
+
+<div class="jb_cell">
+
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">X</span><span class="o">.</span><span class="n">States</span><span class="p">()</span><span class="o">.</span><span class="n">sim</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+</div>
+
+<div class="jb_cell">
+
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>Let $T$ denote the time at which the weather moves from being currently sunny to a different state (either rainy or cloudy.)</p>
+
+</div>
+</div>
+</div>
+</div>
+
+<div class="jb_cell">
+
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">T</span> <span class="o">=</span> <span class="n">X</span><span class="o">.</span><span class="n">JumpTimes</span><span class="p">()[</span><span class="mi">1</span><span class="p">]</span>
+<span class="n">sims</span> <span class="o">=</span> <span class="n">T</span><span class="o">.</span><span class="n">sim</span><span class="p">(</span><span class="mi">10000</span><span class="p">)</span>
+<span class="n">sims</span><span class="o">.</span><span class="n">plot</span><span class="p">()</span>
+<span class="n">sims</span><span class="o">.</span><span class="n">mean</span><span class="p">(),</span> <span class="n">sims</span><span class="o">.</span><span class="n">var</span><span class="p">()</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+</div>
+
+<div class="jb_cell">
+
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>Note that InterjumpTimes are indexed starting at 0, so <code>.InterjumpTimes()[0]</code> is time between time 0 and the first jump, <code>.InterjumpTimes()[1]</code> is the time between the first and second jump, etc.</p>
+
+</div>
+</div>
+</div>
+</div>
+
+<div class="jb_cell">
+
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">T</span> <span class="o">=</span> <span class="n">X</span><span class="o">.</span><span class="n">InterjumpTimes</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span>
+<span class="n">sims</span> <span class="o">=</span> <span class="n">T</span><span class="o">.</span><span class="n">sim</span><span class="p">(</span><span class="mi">10000</span><span class="p">)</span>
+<span class="n">sims</span><span class="o">.</span><span class="n">plot</span><span class="p">()</span>
+<span class="n">sims</span><span class="o">.</span><span class="n">mean</span><span class="p">(),</span> <span class="n">sims</span><span class="o">.</span><span class="n">var</span><span class="p">()</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+</div>
+
+<div class="jb_cell">
+
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>For a continuous time Markov chain, the times between jumps are independent.</p>
+
+</div>
+</div>
+</div>
+</div>
+
+<div class="jb_cell">
+
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">sims</span> <span class="o">=</span> <span class="p">(</span><span class="n">X</span><span class="o">.</span><span class="n">InterjumpTimes</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span> <span class="o">&amp;</span> <span class="n">X</span><span class="o">.</span><span class="n">InterjumpTimes</span><span class="p">()[</span><span class="mi">1</span><span class="p">])</span><span class="o">.</span><span class="n">sim</span><span class="p">(</span><span class="mi">10000</span><span class="p">)</span>
+<span class="n">sims</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">alpha</span> <span class="o">=</span> <span class="mf">0.1</span><span class="p">)</span>
+<span class="n">sims</span><span class="o">.</span><span class="n">corr</span><span class="p">()</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+</div>
+
+<div class="jb_cell">
+
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>For a <code>PoissonProcess</code>, arrival times and interarrival times can be accessed with <code>.ArrivalTimes()</code> and <code>.InterarrivalTimes()</code>.</p>
+<p><em>Example.</em> Let $N$ be a Poisson process with rate 2.</p>
+
+</div>
+</div>
+</div>
+</div>
+
+<div class="jb_cell">
+
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">N</span> <span class="o">=</span> <span class="n">PoissonProcess</span><span class="p">(</span><span class="n">rate</span> <span class="o">=</span> <span class="mi">2</span><span class="p">)</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+</div>
+
+<div class="jb_cell">
+
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>Simulate the arrival times for one sample path.</p>
+
+</div>
+</div>
+</div>
+</div>
+
+<div class="jb_cell">
+
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">N</span><span class="o">.</span><span class="n">ArrivalTimes</span><span class="p">()</span><span class="o">.</span><span class="n">sim</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+</div>
+
+<div class="jb_cell">
+
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>Let $T$ be the time of the first arrival. Approximate the distribution of $T$, and its mean and variance.  (Should be Exponential with rate 2.)</p>
+
+</div>
+</div>
+</div>
+</div>
+
+<div class="jb_cell">
+
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">T</span> <span class="o">=</span> <span class="n">N</span><span class="o">.</span><span class="n">ArrivalTimes</span><span class="p">()[</span><span class="mi">1</span><span class="p">]</span>
+<span class="n">t</span> <span class="o">=</span> <span class="n">T</span><span class="o">.</span><span class="n">sim</span><span class="p">(</span><span class="mi">10000</span><span class="p">)</span>
+<span class="n">t</span><span class="o">.</span><span class="n">plot</span><span class="p">()</span>
+<span class="n">t</span><span class="o">.</span><span class="n">mean</span><span class="p">(),</span> <span class="n">t</span><span class="o">.</span><span class="n">var</span><span class="p">()</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+</div>
+
+<div class="jb_cell">
+
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>Approximate the conditional distribution of $T$ given that there is exactly 1 arrival in the first 3 units of time.  (Should be Uniform on (0,3).)</p>
+
+</div>
+</div>
+</div>
+</div>
+
+<div class="jb_cell">
+
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="p">(</span><span class="n">T</span> <span class="o">|</span> <span class="p">(</span><span class="n">N</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span> <span class="o">==</span> <span class="mi">1</span><span class="p">))</span><span class="o">.</span><span class="n">sim</span><span class="p">(</span><span class="mi">10000</span><span class="p">)</span><span class="o">.</span><span class="n">plot</span><span class="p">()</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+</div>
+
+<div class="jb_cell">
+
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>The times between the first two arrivals should be independent</p>
+
+</div>
+</div>
+</div>
+</div>
+
+<div class="jb_cell">
+
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">W0</span> <span class="o">=</span> <span class="n">N</span><span class="o">.</span><span class="n">InterarrivalTimes</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span>
+<span class="n">W1</span> <span class="o">=</span> <span class="n">N</span><span class="o">.</span><span class="n">InterarrivalTimes</span><span class="p">()[</span><span class="mi">1</span><span class="p">]</span>
+
+<span class="n">sims</span> <span class="o">=</span> <span class="p">(</span><span class="n">W0</span> <span class="o">&amp;</span> <span class="n">W1</span><span class="p">)</span><span class="o">.</span><span class="n">sim</span><span class="p">(</span><span class="mi">10000</span><span class="p">)</span>
+<span class="n">sims</span><span class="o">.</span><span class="n">plot</span><span class="p">()</span>
+<span class="n">sims</span><span class="o">.</span><span class="n">corr</span><span class="p">()</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+</div>
+
+ 
+
+
+    </main>
+    

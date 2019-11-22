@@ -1,0 +1,549 @@
+---
+redirect_from:
+  - "/common-joint"
+interact_link: content/common_joint.ipynb
+kernel_name: python3
+has_widgets: false
+title: |-
+  Common Joint Models
+prev_page:
+  url: /common_continuous.html
+  title: |-
+    Common Continuous Models
+next_page:
+  url: /joint.html
+  title: |-
+    Use this!
+suffix: .ipynb
+
+comment: "***PROGRAMMATICALLY GENERATED, DO NOT EDIT. SEE ORIGINAL FILES IN /content***"
+---
+
+    <main class="jupyter-page">
+    
+<div class="jb_cell">
+
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h1 id="Common-Joint-Distributions">Common Joint Distributions<a class="anchor-link" href="#Common-Joint-Distributions"> </a></h1>
+</div>
+</div>
+</div>
+</div>
+
+<div class="jb_cell">
+
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<ol>
+<li><a href="#joint"><strong>Introduction to joint distributions</strong></a></li>
+<li><a href="#bvn"><strong>BivariateNormal</strong></a></li>
+<li><a href="#mvn"><strong>MultivariateNormal</strong></a></li>
+</ol>
+
+</div>
+</div>
+</div>
+</div>
+
+<div class="jb_cell">
+
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>Be sure to import Symbulate using the following commands.</p>
+
+</div>
+</div>
+</div>
+</div>
+
+<div class="jb_cell">
+
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="kn">from</span> <span class="nn">symbulate</span> <span class="k">import</span> <span class="o">*</span>
+<span class="o">%</span><span class="k">matplotlib</span> inline
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+</div>
+
+<div class="jb_cell">
+
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p><a id='joint'></a></p>
+<h3 id="Intoduction-to-joint-distributions">Intoduction to joint distributions<a class="anchor-link" href="#Intoduction-to-joint-distributions"> </a></h3>
+</div>
+</div>
+</div>
+</div>
+
+<div class="jb_cell">
+
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>Recall that a (univariate) probability distribution is a distribution on values $x$ in the real line $\mathbb{R}$.  A <strong>bivariate distribution</strong> is a probability distribution on $(x, y)$ pairs in $\mathbb{R}^2$.  More generally, <strong>joint (a.k.a. multivariate) distributions</strong> are probability distributions on tuples in $\mathbb{R}^n$.  To simplify notation, we introduce definitions for the bivariate case only; the multivate case is analogous.</p>
+<p>A jointly discrete bivariate distribution can be specified by a joint probability mass function (pmf)  $p(\cdot, \cdot)$ which maps an $(x, y)$ pair to its probability $p(x, y)\in [0,1]$.  A bivariate pmf is 0 for all $(x, y)$ pairs outside of some countable set in $\mathbb{R}^2$.</p>
+<p>A probability measure $P$ on $\mathbb{R}^2$ is specified by a jointly continuous probability density function $f(\cdot, \cdot)$ if for any event $A \subset \mathbb{R}^2$,</p>
+$$
+P(A) = \iint\limits_A\, f(x,y)\, dx\, dy.
+$$<p>Analogous to the <a href="common_discrete.html#pmf">probability mass function</a> of a single discrete random variable, the <strong>joint probability mass function</strong> $p_{X,Y}$ of two discrete random variables $X$ and $Y$ defined on the same probability space with probability measure $P$ is defined by:</p>
+$$
+p_{X,Y}(x,y) = P(X = x, Y = y).
+$$<p>A joint probability mass function is a probability distribution on $(x, y)$ pairs.</p>
+<p>Analogous to the <a href="common_continuous.html#pdf">probability density function</a>  of a continuous random variable, the <strong>joint probability density functon</strong> $f_{X,Y}$ of two jointly continuous random variables $X$ and $Y$ defined on the same probability space with probability measure $P$ satisfies, for any two-dimensional region $A\subset \mathbb{R}^2$,</p>
+$$
+P((X,Y) \in A) = \iint\limits_A f_{X,Y}(x,y)\,dx\, dy.
+$$<p>A joint probability density function specifies a probability distribution on $(x, y)$ pairs.  Recall that for a continuous random variable $X$, <a href="https://dlsun.github.io/symbulate/common_continuous.html#continuous">the density $f_X(x)$ at a point $x$ is not a probability</a>.  Likewise, a joint conditional probability density function does represent joint probabilities.  Rather, $f_{X, Y}(x, y)$ is related to the probability that the $(X, Y)$ pair is "close to" $(x, y)$.</p>
+$$
+P\left(x - h/2 &lt; X &lt; x + h/2\, ,\, y - h/2 &lt; Y &lt; y + h/2 \right)\, \approx\, h^2\, f_{X, Y}(x, y)
+$$<p>Of course, it is also possible to have situations where one of $X$ and $Y$ is discrete and the other is continuous.</p>
+<p>The <strong>joint cumulative distribution function</strong> $F_{X, Y}:\mathbb{R}^2\mapsto[0,1]$ of two random variables $X$ and $Y$ defined on the same probability space with probability measure $P$ is defined as</p>
+$$
+F_{X,Y}(x,y) = P(X \leq x,Y \leq y)
+$$<p>Intuitvely, a collection of random variables are <em>independent</em> if knowing the values of some does not influence the joint distribution of the others.  Random variables $X$ and $Y$ are independent if the joint distribution factors into the product of the  corresponding marginal distributions.  That is, for independent RVs the joint distribution is fully specified by the marginal distributions. Stated in terms of cdfs, random variables $X$ and $Y$ are <strong>independent</strong> if and only if for all $(x, y)$ pairs</p>
+$$
+F_{X,Y}(x,y) = F_X(x) F_Y(y)
+$$
+</div>
+</div>
+</div>
+</div>
+
+<div class="jb_cell">
+
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p><a id='bvn'></a></p>
+<h3 id="Bivariate-Normal">Bivariate Normal<a class="anchor-link" href="#Bivariate-Normal"> </a></h3>
+</div>
+</div>
+</div>
+</div>
+
+<div class="jb_cell">
+
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>A <strong>Bivariate Normal</strong> (a.k.a. <strong>Bivariate Gaussian</strong>) is specified by two marginal means $\mu_1, \mu_2$, two marginal standard deviations $\sigma_1, \sigma_2$ (or variances), and the correlation coefficient $\rho$ (or covariance).  A Bivariate normal distribution has joint density
+$$
+f(x, y) = \frac{1}{2\pi\sigma_1\sigma_2 \sqrt{1-\rho^2}} \exp\left(-\frac{1}{2(1-\rho^2)}\left[\left(\frac{x-\mu_1}{\sigma_1}\right)^2 + \left(\frac{y-\mu_2}{\sigma_2}\right)^2 - 2\rho \left(\frac{x-\mu_1}{\sigma_1}\right)\left(\frac{y-\mu_2}{\sigma_2}\right)\right]\right), \quad -\infty &lt; x&lt; \infty, \, -\infty &lt; y &lt; \infty
+$$</p>
+
+</div>
+</div>
+</div>
+</div>
+
+<div class="jb_cell">
+
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">RV</span><span class="p">(</span><span class="n">BivariateNormal</span><span class="p">(</span><span class="n">mean1</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="n">mean2</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span> <span class="n">sd1</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span> <span class="n">sd2</span> <span class="o">=</span> <span class="mi">2</span><span class="p">,</span> <span class="n">corr</span> <span class="o">=</span> <span class="mf">0.5</span><span class="p">))</span><span class="o">.</span><span class="n">sim</span><span class="p">(</span><span class="mi">5</span><span class="p">)</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="jb_output_wrapper }}">
+<div class="output_area">
+
+
+<div class="output_html rendered_html output_subarea output_execute_result">
+
+    <table>
+      <thead>
+        <th width="10%">Index</th>
+        <th width="90%">Result</th>
+      </thead>
+      <tbody>
+        
+        <tr>
+          <td>0</td><td>(-2.475672241221046, -3.2794108607026713)</td>
+        </tr>
+        
+        <tr>
+          <td>1</td><td>(-1.3501444783713075, -2.219782020114984)</td>
+        </tr>
+        
+        <tr>
+          <td>2</td><td>(-0.06977519497466034, -4.325440625194828)</td>
+        </tr>
+        
+        <tr>
+          <td>3</td><td>(-0.269313700927925, 1.5130174573400894)</td>
+        </tr>
+        
+        <tr>
+          <td>4</td><td>(0.1291697740120339, -2.5993533148843144)</td>
+        </tr>
+        
+      </tbody>
+    </table>
+        
+</div>
+
+</div>
+</div>
+</div>
+</div>
+
+</div>
+</div>
+
+<div class="jb_cell">
+
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">x</span> <span class="o">=</span> <span class="n">RV</span><span class="p">(</span><span class="n">BivariateNormal</span><span class="p">(</span><span class="n">mean1</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="n">mean2</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span> <span class="n">sd1</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span> <span class="n">sd2</span> <span class="o">=</span> <span class="mi">2</span><span class="p">,</span> <span class="n">corr</span> <span class="o">=</span> <span class="mf">0.5</span><span class="p">))</span><span class="o">.</span><span class="n">sim</span><span class="p">(</span><span class="mi">1000</span><span class="p">)</span>
+<span class="n">x</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">alpha</span> <span class="o">=</span> <span class="mf">0.2</span><span class="p">)</span>
+<span class="n">x</span><span class="o">.</span><span class="n">mean</span><span class="p">(),</span> <span class="n">x</span><span class="o">.</span><span class="n">sd</span><span class="p">(),</span> <span class="n">x</span><span class="o">.</span><span class="n">corr</span><span class="p">()</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="jb_output_wrapper }}">
+<div class="output_area">
+
+
+
+<div class="output_text output_subarea output_execute_result">
+<pre>((0.019036842135538225, 0.9566722127153342),
+ (0.9911603104285361, 2.009380421881209),
+ 0.5179915834816445)</pre>
+</div>
+
+</div>
+</div>
+<div class="jb_output_wrapper }}">
+<div class="output_area">
+
+
+
+<div class="output_png output_subarea ">
+<img src="images/common_joint_9_1.png"
+>
+</div>
+
+</div>
+</div>
+</div>
+</div>
+
+</div>
+</div>
+
+<div class="jb_cell">
+
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">RV</span><span class="p">(</span><span class="n">BivariateNormal</span><span class="p">(</span><span class="n">mean1</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="n">mean2</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span> <span class="n">sd1</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span> <span class="n">sd2</span> <span class="o">=</span> <span class="mi">2</span><span class="p">,</span> <span class="n">corr</span> <span class="o">=</span> <span class="mf">0.5</span><span class="p">))</span><span class="o">.</span><span class="n">sim</span><span class="p">(</span><span class="mi">1000</span><span class="p">)</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">alpha</span> <span class="o">=</span> <span class="mf">0.2</span><span class="p">)</span>
+<span class="n">RV</span><span class="p">(</span><span class="n">BivariateNormal</span><span class="p">(</span><span class="n">mean1</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="n">mean2</span> <span class="o">=</span> <span class="o">-</span><span class="mi">2</span><span class="p">,</span> <span class="n">var1</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span> <span class="n">var2</span> <span class="o">=</span> <span class="mi">4</span><span class="p">,</span> <span class="n">cov</span> <span class="o">=</span> <span class="o">-</span><span class="mf">1.8</span><span class="p">))</span><span class="o">.</span><span class="n">sim</span><span class="p">(</span><span class="mi">1000</span><span class="p">)</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">alpha</span> <span class="o">=</span> <span class="mf">0.2</span><span class="p">)</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="jb_output_wrapper }}">
+<div class="output_area">
+
+
+
+<div class="output_png output_subarea ">
+<img src="images/common_joint_10_0.png"
+>
+</div>
+
+</div>
+</div>
+</div>
+</div>
+
+</div>
+</div>
+
+<div class="jb_cell">
+
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>The marginal distributions of a bivariate normal distribution are (univariate) normal distributions.</p>
+
+</div>
+</div>
+</div>
+</div>
+
+<div class="jb_cell">
+
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">X</span><span class="p">,</span> <span class="n">Y</span> <span class="o">=</span> <span class="n">RV</span><span class="p">(</span><span class="n">BivariateNormal</span><span class="p">(</span><span class="n">mean1</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="n">mean2</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span> <span class="n">sd1</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span> <span class="n">sd2</span> <span class="o">=</span> <span class="mi">2</span><span class="p">,</span> <span class="n">corr</span> <span class="o">=</span> <span class="mf">0.5</span><span class="p">))</span>
+<span class="n">X</span><span class="o">.</span><span class="n">sim</span><span class="p">(</span><span class="mi">10000</span><span class="p">)</span><span class="o">.</span><span class="n">plot</span><span class="p">()</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="jb_output_wrapper }}">
+<div class="output_area">
+
+
+
+<div class="output_png output_subarea ">
+<img src="images/common_joint_12_0.png"
+>
+</div>
+
+</div>
+</div>
+</div>
+</div>
+
+</div>
+</div>
+
+<div class="jb_cell">
+
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p><a id='mvn'></a></p>
+<h3 id="Multivate-Normal">Multivate Normal<a class="anchor-link" href="#Multivate-Normal"> </a></h3>
+</div>
+</div>
+</div>
+</div>
+
+<div class="jb_cell">
+
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p><strong>Multivariate Normal distributions.</strong> A bivariate normal distribution is a special case of a Multivariate Normal distribution (a.k.a. joint Gaussian distribution).  A multivariate normal distribution is specified by</p>
+<ul>
+<li>a mean vector, which specifies the marginal means</li>
+<li>a covariance matrix, which specifies the covariance between each coordinate pair.  (The diagonal entries of the covariance matrix specify the marginal variances</li>
+</ul>
+
+</div>
+</div>
+</div>
+</div>
+
+<div class="jb_cell">
+
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">mu</span> <span class="o">=</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">]</span>
+<span class="n">Sigma</span> <span class="o">=</span> <span class="p">[[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">2</span><span class="p">],</span>
+         <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span>
+         <span class="p">[</span><span class="o">-</span><span class="mi">2</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">9</span><span class="p">]]</span>
+<span class="n">X</span> <span class="o">=</span> <span class="n">RV</span><span class="p">(</span><span class="n">MultivariateNormal</span><span class="p">(</span><span class="n">mean</span> <span class="o">=</span> <span class="n">mu</span><span class="p">,</span> <span class="n">cov</span> <span class="o">=</span> <span class="n">Sigma</span><span class="p">))</span>
+<span class="n">X</span><span class="o">.</span><span class="n">sim</span><span class="p">(</span><span class="mi">5</span><span class="p">)</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="jb_output_wrapper }}">
+<div class="output_area">
+
+
+<div class="output_html rendered_html output_subarea output_execute_result">
+
+    <table>
+      <thead>
+        <th width="10%">Index</th>
+        <th width="90%">Result</th>
+      </thead>
+      <tbody>
+        
+        <tr>
+          <td>0</td><td>(1.7746384950668848, 3.6086427624899153, 0.8624673311779487)</td>
+        </tr>
+        
+        <tr>
+          <td>1</td><td>(2.507534470704685, 2.936186893151065, 0.7891365707472366)</td>
+        </tr>
+        
+        <tr>
+          <td>2</td><td>(0.8969886176132308, 0.9388451994188012, -1.161724300098081)</td>
+        </tr>
+        
+        <tr>
+          <td>3</td><td>(3.0074212340720496, 1.129835862980164, -1.7139652158479244)</td>
+        </tr>
+        
+        <tr>
+          <td>4</td><td>(0.48671001834794225, 0.4338092879236535, 4.51548461110952)</td>
+        </tr>
+        
+      </tbody>
+    </table>
+        
+</div>
+
+</div>
+</div>
+</div>
+</div>
+
+</div>
+</div>
+
+<div class="jb_cell">
+
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">x</span> <span class="o">=</span> <span class="n">X</span><span class="o">.</span><span class="n">sim</span><span class="p">(</span><span class="mi">10000</span><span class="p">)</span>
+<span class="n">x</span><span class="o">.</span><span class="n">mean</span><span class="p">(),</span> <span class="n">x</span><span class="o">.</span><span class="n">cov</span><span class="p">()</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="jb_output_wrapper }}">
+<div class="output_area">
+
+
+
+<div class="output_text output_subarea output_execute_result">
+<pre>((1.0100085528104872, 2.017977818193764, 2.9604311918176105),
+ array([[ 1.01363298e+00,  1.00144652e+00, -2.05931416e+00],
+        [ 1.00144652e+00,  3.98500923e+00, -4.46121654e-03],
+        [-2.05931416e+00, -4.46121654e-03,  9.19552125e+00]]))</pre>
+</div>
+
+</div>
+</div>
+</div>
+</div>
+
+</div>
+</div>
+
+<div class="jb_cell">
+
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">X</span><span class="p">,</span> <span class="n">Y</span><span class="p">,</span> <span class="n">Z</span> <span class="o">=</span> <span class="n">RV</span><span class="p">(</span><span class="n">MultivariateNormal</span><span class="p">(</span><span class="n">mean</span> <span class="o">=</span> <span class="n">mu</span><span class="p">,</span> <span class="n">cov</span> <span class="o">=</span> <span class="n">Sigma</span><span class="p">))</span>
+<span class="p">(</span><span class="n">X</span> <span class="o">&amp;</span> <span class="n">Y</span><span class="p">)</span><span class="o">.</span><span class="n">sim</span><span class="p">(</span><span class="mi">10000</span><span class="p">)</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">alpha</span> <span class="o">=</span> <span class="mf">0.2</span><span class="p">)</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="jb_output_wrapper }}">
+<div class="output_area">
+
+
+
+<div class="output_png output_subarea ">
+<img src="images/common_joint_17_0.png"
+>
+</div>
+
+</div>
+</div>
+</div>
+</div>
+
+</div>
+</div>
+
+<div class="jb_cell">
+
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">X</span><span class="o">.</span><span class="n">sim</span><span class="p">(</span><span class="mi">10000</span><span class="p">)</span><span class="o">.</span><span class="n">plot</span><span class="p">()</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="jb_output_wrapper }}">
+<div class="output_area">
+
+
+
+<div class="output_png output_subarea ">
+<img src="images/common_joint_18_0.png"
+>
+</div>
+
+</div>
+</div>
+</div>
+</div>
+
+</div>
+</div>
+
+ 
+
+
+    </main>
+    

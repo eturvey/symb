@@ -1,0 +1,619 @@
+---
+interact_link: content/process.ipynb
+kernel_name: python3
+has_widgets: false
+title: |-
+  Random Processes
+prev_page:
+  url: /rv.html
+  title: |-
+    Random Variables
+next_page:
+  url: /simworld.html
+  title: |-
+    Simulation World
+suffix: .ipynb
+
+comment: "***PROGRAMMATICALLY GENERATED, DO NOT EDIT. SEE ORIGINAL FILES IN /content***"
+---
+
+    <main class="jupyter-page">
+    
+<div class="jb_cell">
+
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h1 id="Random-Processes">Random Processes<a class="anchor-link" href="#Random-Processes"> </a></h1>
+</div>
+</div>
+</div>
+</div>
+
+<div class="jb_cell">
+
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p><a id='contents'></a></p>
+
+</div>
+</div>
+</div>
+</div>
+
+<div class="jb_cell">
+
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<ol>
+<li><a href="#time"><strong>RandomProcess and TimeIndex</strong></a></li>
+<li><a href="#Xt"><strong>Defining a RandomProcess explicitly as a function of time</strong></a></li>
+<li><a href="#value"><strong>Process values at particular time points</strong></a></li>
+<li><a href="#mean"><strong>Mean function</strong></a></li>
+<li><a href="#rw"><strong>Defining a RandomProcess incrementally</strong></a></li>
+</ol>
+
+</div>
+</div>
+</div>
+</div>
+
+<div class="jb_cell">
+
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>Be sure to import Symbulate using the following commands.</p>
+
+</div>
+</div>
+</div>
+</div>
+
+<div class="jb_cell">
+
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="kn">from</span> <span class="nn">symbulate</span> <span class="k">import</span> <span class="o">*</span>
+<span class="o">%</span><span class="k">matplotlib</span> inline
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+</div>
+
+<div class="jb_cell">
+
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p><a id='process'></a></p>
+
+</div>
+</div>
+</div>
+</div>
+
+<div class="jb_cell">
+
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h3 id="Random-processes">Random processes<a class="anchor-link" href="#Random-processes"> </a></h3><p>A <strong>random process</strong> (a.k.a. <strong>stochastic process</strong>) is an indexed collection of random variables defined on some probability space.  The index often represents "time", which can be either discrete or continuous.</p>
+<ul>
+<li>A <strong>discrete time stochastic process</strong> is a collection of countably many random variables, e.g. $X_n$ for $n=0 ,1, 2,\ldots$.  For each outcome in the probability space, the outcome of a discrete time stochastic process is a <em>sequence</em> (in $n$).  (Remember Python starts indexing at 0.  The zero-based-index is often natural in stochastic process contexts in which there is a time 0, i.e. $X_0$ is the initial value of the process.)</li>
+<li>A <strong>continuous time stochastic process</strong> is a collection of uncountably many random variables, e.g. $X_t$ for $t\ge0$.  For each outcome in the probability space, the outcome of a discrete time stochastic process is a <em>function</em> (a.k.a. <em>sample path</em>) (of $t$).</li>
+</ul>
+
+</div>
+</div>
+</div>
+</div>
+
+<div class="jb_cell">
+
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p><a id='time'></a></p>
+
+</div>
+</div>
+</div>
+</div>
+
+<div class="jb_cell">
+
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h3 id="RandomProcess-and-TimeIndex">RandomProcess and TimeIndex<a class="anchor-link" href="#RandomProcess-and-TimeIndex"> </a></h3><p>Much like <code>RV</code>, a <strong>RandomProcess</strong> can be defined on a ProbabilitySpace.  For a <code>RandomProcess</code>, however, the <strong>TimeIndex</strong> must also be specified.  TimeIndex takes a single parameter, the <strong>sampling frequency</strong> <code>fs</code>.  While many values of <code>fs</code> are allowed, the two most common inputs for <code>fs</code> are</p>
+<ul>
+<li><code>TimeIndex(fs=1)</code>, for a discrete time process $X_n, n = 0, 1, 2, \ldots$.</li>
+<li><code>TimeIndex(fs=inf)</code>, for a continuous time process $X(t), t\ge0$.</li>
+</ul>
+
+</div>
+</div>
+</div>
+</div>
+
+<div class="jb_cell">
+
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p><a id='Xt'></a></p>
+
+</div>
+</div>
+</div>
+</div>
+
+<div class="jb_cell">
+
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h3 id="Defining-a-RandomProcess-explicity-as-a-function-of-time">Defining a RandomProcess explicity as a function of time<a class="anchor-link" href="#Defining-a-RandomProcess-explicity-as-a-function-of-time"> </a></h3><p>A random variable is a function $X$ which maps an outcome $\omega$ in a probability space $\Omega$ to a real value $X(\omega)$.  Similarly, a random process is a function $X$ which maps an outcome $\omega$ and a time $t$ in the time index set to the process value at that time $X(\omega, t)$. In some situations, the function defining the random process can be specified explicitly.</p>
+<p><em>Example.</em> Let $X(t) = A + B t, t\ge0$ where $A$ and $B$ are independent with $A\sim$ Bernoulli(0.9) and $B\sim$ Bernoulli(0.7).  In this case, there are only 4 possible sample paths.</p>
+<ul>
+<li>$X(t) = 0$, when $A=0, B=0$, which occurs with probability $0.03$</li>
+<li>$X(t) = 1$, when $A=1, B=0$, which occurs with probability $0.27$</li>
+<li>$X(t) = t$, when $A=0, B=1$, which occurs with probability $0.07$</li>
+<li>$X(t) = 1+t$, when $A=1, B=1$, which occurs with probability $0.63$</li>
+</ul>
+<p>The following code defines a RandomProcess <code>X</code> by first defining an appropriate function <code>f</code>.  Note that an outcome in the probability space consists of an $A, B$ pair, represented as $\omega_0$ and $\omega_1$ in the function.  A RandomProcess is then defined by specifying: the probability space, the time index set, and the $X(\omega, t)$ function.</p>
+
+</div>
+</div>
+</div>
+</div>
+
+<div class="jb_cell">
+
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="k">def</span> <span class="nf">f</span><span class="p">(</span><span class="n">omega</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">omega</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="n">omega</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">*</span> <span class="n">t</span>
+
+<span class="n">X</span> <span class="o">=</span> <span class="n">RandomProcess</span><span class="p">(</span><span class="n">Bernoulli</span><span class="p">(</span><span class="mf">0.9</span><span class="p">)</span> <span class="o">*</span> <span class="n">Bernoulli</span><span class="p">(</span><span class="mf">0.7</span><span class="p">),</span> <span class="n">TimeIndex</span><span class="p">(</span><span class="n">fs</span><span class="o">=</span><span class="n">inf</span><span class="p">),</span> <span class="n">f</span><span class="p">)</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="jb_output_wrapper }}">
+<div class="output_area">
+
+<div class="output_subarea output_text output_error">
+<pre>
+<span class="ansi-red-fg">---------------------------------------------------------------------------</span>
+<span class="ansi-red-fg">NameError</span>                                 Traceback (most recent call last)
+<span class="ansi-green-fg">&lt;ipython-input-4-86b4dac691bc&gt;</span> in <span class="ansi-cyan-fg">&lt;module&gt;</span>
+<span class="ansi-green-intense-fg ansi-bold">      2</span>     <span class="ansi-green-fg">return</span> omega<span class="ansi-blue-fg">[</span><span class="ansi-cyan-fg">0</span><span class="ansi-blue-fg">]</span> <span class="ansi-blue-fg">+</span> omega<span class="ansi-blue-fg">[</span><span class="ansi-cyan-fg">1</span><span class="ansi-blue-fg">]</span> <span class="ansi-blue-fg">*</span> t
+<span class="ansi-green-intense-fg ansi-bold">      3</span> 
+<span class="ansi-green-fg">----&gt; 4</span><span class="ansi-red-fg"> </span>X <span class="ansi-blue-fg">=</span> RandomProcess<span class="ansi-blue-fg">(</span>Bernoulli<span class="ansi-blue-fg">(</span><span class="ansi-cyan-fg">0.9</span><span class="ansi-blue-fg">)</span> <span class="ansi-blue-fg">*</span> Bernoulli<span class="ansi-blue-fg">(</span><span class="ansi-cyan-fg">0.7</span><span class="ansi-blue-fg">)</span><span class="ansi-blue-fg">,</span> TimeIndex<span class="ansi-blue-fg">(</span>fs<span class="ansi-blue-fg">=</span>inf<span class="ansi-blue-fg">)</span><span class="ansi-blue-fg">,</span> f<span class="ansi-blue-fg">)</span>
+
+<span class="ansi-red-fg">NameError</span>: name &#39;TimeIndex&#39; is not defined</pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+
+</div>
+</div>
+
+<div class="jb_cell">
+
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>Like RV, RandomProcess only defines the random process.  Values of the process can be simulated using the usual <a href="sim.html">simulation tools</a>.  Since a stochastic process is a collection of random variables, many of the commands in the previous sections (<a href="rv.html">Random variables</a>, <a href="joint.html">Multiple random variables</a>, <a href="conditioning.html">Conditioning</a>) are useful when simulating stochastic processes.</p>
+<p>For a given outcome in the probability space, a random process outputs a <strong>sample path</strong> which describes how the value of the process evolves over time for that particular outcome.  Calling <code>.plot()</code> for a RandomProcess will return a plot of sample paths.  The parameter <code>alpha</code> controls the weight of the line drawn in the plot.  The paramaters <code>tmin</code> and <code>tmax</code> control the range of time values in the display.</p>
+
+</div>
+</div>
+</div>
+</div>
+
+<div class="jb_cell">
+
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">X</span><span class="o">.</span><span class="n">sim</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">alpha</span> <span class="o">=</span> <span class="mi">1</span><span class="p">)</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+</div>
+
+<div class="jb_cell">
+
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>Simulate and plot many sample paths, specifying the range of $t$ values to plot.  Note that the darkness of a path represents its relative likelihood.</p>
+
+</div>
+</div>
+</div>
+</div>
+
+<div class="jb_cell">
+
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">X</span><span class="o">.</span><span class="n">sim</span><span class="p">(</span><span class="mi">100</span><span class="p">)</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">tmin</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">tmax</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+</div>
+
+<div class="jb_cell">
+
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p><a id='value'></a></p>
+
+</div>
+</div>
+</div>
+</div>
+
+<div class="jb_cell">
+
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h3 id="Process-values-at-particular-time-points">Process values at particular time points<a class="anchor-link" href="#Process-values-at-particular-time-points"> </a></h3><p>The value $X(t)$ (or $X_n$) of a stochastic process at any particular point in time $t$ (or $n$) is a random variable.  These random variables can be accessed using brackets <code>[]</code>.  Note that the value inside the brackets represents <em>time</em> $t$ or $n$.  Many of the commands in the previous sections (<a href="rv.html">Random variables</a>, <a href="joint.html">Multiple random variables</a>, <a href="conditioning.html">Conditioning</a>) are useful when simulating stochastic processes.</p>
+
+</div>
+</div>
+</div>
+</div>
+
+<div class="jb_cell">
+
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p><em>Example.</em> Let $X(t) = A + B t, t\ge0$ where $A$ and $B$ are independent with $A\sim$ Bernoulli(0.9) and $B\sim$ Bernoulli(0.7).</p>
+<p>Find the distribution of $X(1.5)$, the process value at time $t=1.5$.</p>
+
+</div>
+</div>
+</div>
+</div>
+
+<div class="jb_cell">
+
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="k">def</span> <span class="nf">f</span><span class="p">(</span><span class="n">omega</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">omega</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">*</span> <span class="n">t</span> <span class="o">+</span> <span class="n">omega</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+
+<span class="n">X</span> <span class="o">=</span> <span class="n">RandomProcess</span><span class="p">(</span><span class="n">Bernoulli</span><span class="p">(</span><span class="mf">0.9</span><span class="p">)</span> <span class="o">*</span> <span class="n">Bernoulli</span><span class="p">(</span><span class="mf">0.7</span><span class="p">),</span> <span class="n">TimeIndex</span><span class="p">(</span><span class="n">fs</span><span class="o">=</span><span class="n">inf</span><span class="p">),</span> <span class="n">f</span><span class="p">)</span>
+
+<span class="n">X</span><span class="p">[</span><span class="mf">1.5</span><span class="p">]</span><span class="o">.</span><span class="n">sim</span><span class="p">(</span><span class="mi">10000</span><span class="p">)</span><span class="o">.</span><span class="n">plot</span><span class="p">()</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+</div>
+
+<div class="jb_cell">
+
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>Find the joint distribution of process values at times 1 and 1.5.</p>
+
+</div>
+</div>
+</div>
+</div>
+
+<div class="jb_cell">
+
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="p">(</span><span class="n">X</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">&amp;</span> <span class="n">X</span><span class="p">[</span><span class="mf">1.5</span><span class="p">])</span><span class="o">.</span><span class="n">sim</span><span class="p">(</span><span class="mi">1000</span><span class="p">)</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="s2">&quot;tile&quot;</span><span class="p">)</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+</div>
+
+<div class="jb_cell">
+
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>Find the conditional distribution of $X(1.5)$ given $X(1) = 1)$.</p>
+
+</div>
+</div>
+</div>
+</div>
+
+<div class="jb_cell">
+
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="p">(</span><span class="n">X</span><span class="p">[</span><span class="mf">1.5</span><span class="p">]</span> <span class="o">|</span> <span class="p">(</span><span class="n">X</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="mi">1</span><span class="p">))</span><span class="o">.</span><span class="n">sim</span><span class="p">(</span><span class="mi">10000</span><span class="p">)</span><span class="o">.</span><span class="n">plot</span><span class="p">()</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+</div>
+
+<div class="jb_cell">
+
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p><a id='mean'></a></p>
+
+</div>
+</div>
+</div>
+</div>
+
+<div class="jb_cell">
+
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h3 id="Mean-function">Mean function<a class="anchor-link" href="#Mean-function"> </a></h3><p>The mean function of a stochastic process $X(t)$ is a deterministic function which maps $t$ to $E(X(t))$.  The mean function can be estimated and plotted by simulating many sample paths of the process and using <code>.mean()</code>.</p>
+
+</div>
+</div>
+</div>
+</div>
+
+<div class="jb_cell">
+
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">paths</span> <span class="o">=</span> <span class="n">X</span><span class="o">.</span><span class="n">sim</span><span class="p">(</span><span class="mi">1000</span><span class="p">)</span>
+<span class="n">plot</span><span class="p">(</span><span class="n">paths</span><span class="p">)</span>
+<span class="n">plot</span><span class="p">(</span><span class="n">paths</span><span class="o">.</span><span class="n">mean</span><span class="p">(),</span> <span class="s1">&#39;r&#39;</span><span class="p">)</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+</div>
+
+<div class="jb_cell">
+
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>The <strong>variance</strong> function maps $t$ to $Var(X(t))$; similarly for the <strong>standard deviation</strong> function.  These functions can be used to give error bands about the mean function.</p>
+
+</div>
+</div>
+</div>
+</div>
+
+<div class="jb_cell">
+
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># This illustrates the functionality, but is not an appropriate example for +/- 2SD</span>
+<span class="n">plot</span><span class="p">(</span><span class="n">paths</span><span class="p">)</span>
+<span class="n">paths</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="s1">&#39;--&#39;</span><span class="p">)</span>
+<span class="p">(</span><span class="n">paths</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span> <span class="o">+</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">paths</span><span class="o">.</span><span class="n">sd</span><span class="p">())</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="s1">&#39;--&#39;</span><span class="p">)</span>
+<span class="p">(</span><span class="n">paths</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span> <span class="o">-</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">paths</span><span class="o">.</span><span class="n">sd</span><span class="p">())</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="s1">&#39;--&#39;</span><span class="p">)</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+</div>
+
+<div class="jb_cell">
+
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p><a id='rw'></a></p>
+
+</div>
+</div>
+</div>
+</div>
+
+<div class="jb_cell">
+
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h3 id="Defining-a-RandomProcess-incrementally">Defining a RandomProcess incrementally<a class="anchor-link" href="#Defining-a-RandomProcess-incrementally"> </a></h3><p>There are few situations like the linear process in the example above in which the random process can be expressed explicitly as a function of the probability space outcome and the time value.  More commonly, random processes are often defined incrementally, by specifying the next value of the process given the previous value.</p>
+<p><em>Example.</em> At each point in time $n=0, 1, 2, \ldots$ a certain type of "event" either occurs or not.  Suppose the probability that the event occurs at any particular time is $p=0.5$, and occurrences are independent from time to time.  Let $Z_n=1$ if an event occurs at time $n$, and $Z_n=0$ otherwise.  Then $Z_0, Z_1, Z_2,\ldots$ is a <strong>Bernoulli process</strong>.   In a Bernoulli process, let  $X_n$  count the number of events that have occurred up to and including time  $n$, starting with 0 events at time 0.  Since $Z_{n+1}=1$ if an event occurs at time $n+1$ and $Z_{n+1} = 0$ otherwise, $X_{n+1} = X_n + Z_{n+1}$.</p>
+<p>The following code defines the random process $X$.  The probability space corresponds to the independent Bernoulli random variables; note that <code>inf</code> allows for infinitely many values.  Also notice how the process is defined incrementally through $X_{n+1} = X_n + Z_{n+1}$.</p>
+
+</div>
+</div>
+</div>
+</div>
+
+<div class="jb_cell">
+
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">P</span> <span class="o">=</span> <span class="n">Bernoulli</span><span class="p">(</span><span class="mf">0.5</span><span class="p">)</span><span class="o">**</span><span class="n">inf</span>
+<span class="n">Z</span> <span class="o">=</span> <span class="n">RV</span><span class="p">(</span><span class="n">P</span><span class="p">)</span>
+<span class="n">X</span> <span class="o">=</span> <span class="n">RandomProcess</span><span class="p">(</span><span class="n">P</span><span class="p">,</span> <span class="n">TimeIndex</span><span class="p">(</span><span class="n">fs</span><span class="o">=</span><span class="mi">1</span><span class="p">))</span>
+
+<span class="n">X</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span>  <span class="mi">0</span>
+<span class="k">for</span> <span class="n">n</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">100</span><span class="p">):</span>
+    <span class="n">X</span><span class="p">[</span><span class="n">n</span><span class="o">+</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">X</span><span class="p">[</span><span class="n">n</span><span class="p">]</span> <span class="o">+</span> <span class="n">Z</span><span class="p">[</span><span class="n">n</span><span class="o">+</span><span class="mi">1</span><span class="p">]</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+</div>
+
+<div class="jb_cell">
+
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>The above code defines a random process incrementally.  Once a RandomProcess is defined, it can be manipulated the same way, regardless of how it is defined.</p>
+
+</div>
+</div>
+</div>
+</div>
+
+<div class="jb_cell">
+
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">X</span><span class="o">.</span><span class="n">sim</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">alpha</span> <span class="o">=</span> <span class="mi">1</span><span class="p">)</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+</div>
+
+<div class="jb_cell">
+
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">X</span><span class="o">.</span><span class="n">sim</span><span class="p">(</span><span class="mi">100</span><span class="p">)</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">tmin</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="n">tmax</span> <span class="o">=</span> <span class="mi">5</span><span class="p">)</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+</div>
+
+<div class="jb_cell">
+
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">X</span><span class="p">[</span><span class="mi">5</span><span class="p">]</span><span class="o">.</span><span class="n">sim</span><span class="p">(</span><span class="mi">10000</span><span class="p">)</span><span class="o">.</span><span class="n">plot</span><span class="p">()</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+</div>
+
+<div class="jb_cell">
+
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="p">(</span><span class="n">X</span><span class="p">[</span><span class="mi">5</span><span class="p">]</span> <span class="o">&amp;</span> <span class="n">X</span><span class="p">[</span><span class="mi">10</span><span class="p">])</span><span class="o">.</span><span class="n">sim</span><span class="p">(</span><span class="mi">10000</span><span class="p">)</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="s2">&quot;tile&quot;</span><span class="p">)</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+</div>
+
+<div class="jb_cell">
+
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="p">(</span><span class="n">X</span><span class="p">[</span><span class="mi">10</span><span class="p">]</span> <span class="o">|</span> <span class="p">(</span><span class="n">X</span><span class="p">[</span><span class="mi">5</span><span class="p">]</span> <span class="o">==</span> <span class="mi">3</span><span class="p">))</span><span class="o">.</span><span class="n">sim</span><span class="p">(</span><span class="mi">10000</span><span class="p">)</span><span class="o">.</span><span class="n">plot</span><span class="p">()</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+</div>
+
+<div class="jb_cell">
+
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="p">(</span><span class="n">X</span><span class="p">[</span><span class="mi">5</span><span class="p">]</span> <span class="o">|</span> <span class="p">(</span><span class="n">X</span><span class="p">[</span><span class="mi">10</span><span class="p">]</span> <span class="o">==</span> <span class="mi">4</span><span class="p">))</span><span class="o">.</span><span class="n">sim</span><span class="p">(</span><span class="mi">10000</span><span class="p">)</span><span class="o">.</span><span class="n">plot</span><span class="p">()</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+</div>
+
+ 
+
+
+    </main>
+    

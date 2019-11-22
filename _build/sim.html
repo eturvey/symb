@@ -1,0 +1,2180 @@
+---
+interact_link: content/sim.ipynb
+kernel_name: python3
+has_widgets: false
+title: |-
+  Simulations
+prev_page:
+  url: /simworld.html
+  title: |-
+    Simulation World
+next_page:
+  url: /symobj.html
+  title: |-
+    Space Operations
+suffix: .ipynb
+
+comment: "***PROGRAMMATICALLY GENERATED, DO NOT EDIT. SEE ORIGINAL FILES IN /content***"
+---
+
+    <main class="jupyter-page">
+    
+<div class="jb_cell">
+
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h1 id="Simulation-tools">Simulation tools<a class="anchor-link" href="#Simulation-tools"> </a></h1>
+</div>
+</div>
+</div>
+</div>
+
+<div class="jb_cell">
+
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>There are several tools available for simulating realizations of probabilistic objects &mdash; outcomes from a probability space, events, values of random variables or random vectors, stochastic processes &mdash; and analyzing the results.  In general, the methods below can be chained, one after the other, e.g. <code>P.sim(1000).apply(sum).tabulate()</code>.</p>
+
+</div>
+</div>
+</div>
+</div>
+
+<div class="jb_cell">
+
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p><a id='contents'></a></p>
+
+</div>
+</div>
+</div>
+</div>
+
+<div class="jb_cell">
+
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<ol>
+<li><a href="#sim"><strong>Simulate:</strong></a> <code>.sim()</code> simulates outcomes of a probability model, events, or values of random variables or processes</li>
+<li><a href="#apply"><strong>Apply:</strong></a> <code>.apply()</code> applies a function to each outcome or value</li>
+<li><a href="#tabulate"><strong>Tabulate:</strong></a> <code>.tabulate()</code> creates a table summary of simulated outcomes of a probability model or simulated values of random variables</li>
+<li><a href="#count"><strong>Count:</strong></a> <code>.count()</code> and its relatives count the values which satsify some criteria.</li>
+<li><a href="#filter"><strong>Filter:</strong></a> <code>.filter()</code> and its relatives create <em>subsets</em> of the values which satsify some criteria.</li>
+<li><a href="#get"><strong>Get:</strong></a> <code>.get()</code> returns the results of a particular realization of the simulation.</li>
+<li><a href="#recap"><strong>Summary of commands:</strong></a>  Examples using <code>tabulate</code>, <code>filter</code>, and <code>count</code> to manipulate simulation results.</li>
+</ol>
+
+</div>
+</div>
+</div>
+</div>
+
+<div class="jb_cell">
+
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>Be sure to import Symbulate using the following commands.
+<a id='simulation'></a></p>
+
+</div>
+</div>
+</div>
+</div>
+
+<div class="jb_cell">
+
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="kn">from</span> <span class="nn">symbulate</span> <span class="k">import</span> <span class="o">*</span>
+<span class="o">%</span><span class="k">matplotlib</span> inline
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+</div>
+
+<div class="jb_cell">
+
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p><a id='sim'></a></p>
+
+</div>
+</div>
+</div>
+</div>
+
+<div class="jb_cell">
+
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h3 id="Simulate">Simulate<a class="anchor-link" href="#Simulate"> </a></h3><p>The <code>.draw()</code> extension simulates one realization of the simulation.  Many realizations can be simulated using <code>.sim()</code>; the single argument is the number of repetitions of the simulation to run. (Note that <a href="probspace.html#draw"><code>draw</code></a> is most useful when defining probability spaces, while <code>sim</code> is most useful when actually running simulations.)</p>
+<p><em>Example.</em>  Simulate 100 repetitions of rolling two fair six-sided dice; each repetition involves a pair of values.</p>
+
+</div>
+</div>
+</div>
+</div>
+
+<div class="jb_cell">
+
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">die</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">6</span><span class="o">+</span><span class="mi">1</span><span class="p">))</span> <span class="c1"># this is just a list of the number 1 through 6</span>
+<span class="n">roll</span> <span class="o">=</span> <span class="n">BoxModel</span><span class="p">(</span><span class="n">die</span><span class="p">,</span> <span class="n">size</span> <span class="o">=</span> <span class="mi">2</span><span class="p">)</span>
+<span class="n">roll</span><span class="o">.</span><span class="n">sim</span><span class="p">(</span><span class="mi">100</span><span class="p">)</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="jb_output_wrapper }}">
+<div class="output_area">
+
+
+<div class="output_html rendered_html output_subarea output_execute_result">
+
+    <table>
+      <thead>
+        <th width="10%">Index</th>
+        <th width="90%">Result</th>
+      </thead>
+      <tbody>
+        
+        <tr>
+          <td>0</td><td>(1, 3)</td>
+        </tr>
+        
+        <tr>
+          <td>1</td><td>(3, 1)</td>
+        </tr>
+        
+        <tr>
+          <td>2</td><td>(3, 6)</td>
+        </tr>
+        
+        <tr>
+          <td>3</td><td>(4, 2)</td>
+        </tr>
+        
+        <tr>
+          <td>4</td><td>(3, 1)</td>
+        </tr>
+        
+        <tr>
+          <td>5</td><td>(5, 3)</td>
+        </tr>
+        
+        <tr>
+          <td>6</td><td>(5, 6)</td>
+        </tr>
+        
+        <tr>
+          <td>7</td><td>(6, 3)</td>
+        </tr>
+        
+        <tr>
+          <td>8</td><td>(5, 6)</td>
+        </tr>
+        <tr><td>...</td><td>...</td></tr>
+        <tr>
+          <td>99</td><td>(2, 5)</td>
+        </tr>
+        
+      </tbody>
+    </table>
+        
+</div>
+
+</div>
+</div>
+</div>
+</div>
+
+</div>
+</div>
+
+<div class="jb_cell">
+
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p><strong>Caution:</strong> Note that every time <code>.sim()</code> is called new realizations are simulated.  Store simulated realizations as variables in order to perform multiple operations in different lines of code on the same set of simulated values.</p>
+
+</div>
+</div>
+</div>
+</div>
+
+<div class="jb_cell">
+
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p><em>Example.</em>  Ten percent of all e-mail is spam. Thirty percent of spam e-mails contain the word "money", while 2% of non-spam e-mails contain the word "money". Simulate the email status (spam or not) and wording (money or not) for 1000 emails.</p>
+
+</div>
+</div>
+</div>
+</div>
+
+<div class="jb_cell">
+
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="k">def</span> <span class="nf">spam_sim</span><span class="p">():</span>
+    <span class="n">email_type</span> <span class="o">=</span> <span class="n">BoxModel</span><span class="p">([</span><span class="s2">&quot;spam&quot;</span><span class="p">,</span> <span class="s2">&quot;not spam&quot;</span><span class="p">],</span> <span class="n">probs</span><span class="o">=</span><span class="p">[</span><span class="o">.</span><span class="mi">1</span><span class="p">,</span> <span class="o">.</span><span class="mi">9</span><span class="p">])</span><span class="o">.</span><span class="n">draw</span><span class="p">()</span>
+    <span class="k">if</span> <span class="n">email_type</span> <span class="o">==</span> <span class="s2">&quot;spam&quot;</span><span class="p">:</span>
+        <span class="n">has_money</span> <span class="o">=</span> <span class="n">BoxModel</span><span class="p">([</span><span class="s2">&quot;money&quot;</span><span class="p">,</span> <span class="s2">&quot;no money&quot;</span><span class="p">],</span> <span class="n">probs</span><span class="o">=</span><span class="p">[</span><span class="o">.</span><span class="mi">3</span><span class="p">,</span> <span class="o">.</span><span class="mi">7</span><span class="p">])</span><span class="o">.</span><span class="n">draw</span><span class="p">()</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">has_money</span> <span class="o">=</span> <span class="n">BoxModel</span><span class="p">([</span><span class="s2">&quot;money&quot;</span><span class="p">,</span> <span class="s2">&quot;no money&quot;</span><span class="p">],</span> <span class="n">probs</span><span class="o">=</span><span class="p">[</span><span class="o">.</span><span class="mi">02</span><span class="p">,</span> <span class="o">.</span><span class="mi">98</span><span class="p">])</span><span class="o">.</span><span class="n">draw</span><span class="p">()</span>
+    <span class="k">return</span> <span class="n">email_type</span><span class="p">,</span> <span class="n">has_money</span>
+
+<span class="n">P</span> <span class="o">=</span> <span class="n">ProbabilitySpace</span><span class="p">(</span><span class="n">spam_sim</span><span class="p">)</span>
+<span class="n">sims</span> <span class="o">=</span> <span class="n">P</span><span class="o">.</span><span class="n">sim</span><span class="p">(</span><span class="mi">1000</span><span class="p">)</span>
+<span class="n">sims</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="jb_output_wrapper }}">
+<div class="output_area">
+
+
+<div class="output_html rendered_html output_subarea output_execute_result">
+
+    <table>
+      <thead>
+        <th width="10%">Index</th>
+        <th width="90%">Result</th>
+      </thead>
+      <tbody>
+        
+        <tr>
+          <td>0</td><td>('not spam', 'no money')</td>
+        </tr>
+        
+        <tr>
+          <td>1</td><td>('not spam', 'no money')</td>
+        </tr>
+        
+        <tr>
+          <td>2</td><td>('not spam', 'no money')</td>
+        </tr>
+        
+        <tr>
+          <td>3</td><td>('not spam', 'no money')</td>
+        </tr>
+        
+        <tr>
+          <td>4</td><td>('not spam', 'no money')</td>
+        </tr>
+        
+        <tr>
+          <td>5</td><td>('not spam', 'no money')</td>
+        </tr>
+        
+        <tr>
+          <td>6</td><td>('not spam', 'no money')</td>
+        </tr>
+        
+        <tr>
+          <td>7</td><td>('not spam', 'no money')</td>
+        </tr>
+        
+        <tr>
+          <td>8</td><td>('not spam', 'no money')</td>
+        </tr>
+        <tr><td>...</td><td>...</td></tr>
+        <tr>
+          <td>999</td><td>('not spam', 'no money')</td>
+        </tr>
+        
+      </tbody>
+    </table>
+        
+</div>
+
+</div>
+</div>
+</div>
+</div>
+
+</div>
+</div>
+
+<div class="jb_cell">
+
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p><a id='apply'></a></p>
+
+</div>
+</div>
+</div>
+</div>
+
+<div class="jb_cell">
+
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h3 id="Apply">Apply<a class="anchor-link" href="#Apply"> </a></h3><p>Use <code>.apply()</code> to apply a function on an outcome-by-outcome basis to each realization of a simulation.</p>
+<p><em>Example.</em> Roll two fair six-sided dice and compute their sum.</p>
+
+</div>
+</div>
+</div>
+</div>
+
+<div class="jb_cell">
+
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">die</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">6</span><span class="o">+</span><span class="mi">1</span><span class="p">))</span> <span class="c1"># this is just a list of the number 1 through 6</span>
+<span class="n">roll</span> <span class="o">=</span> <span class="n">BoxModel</span><span class="p">(</span><span class="n">die</span><span class="p">,</span> <span class="n">size</span> <span class="o">=</span> <span class="mi">2</span><span class="p">)</span>
+<span class="n">roll</span><span class="o">.</span><span class="n">sim</span><span class="p">(</span><span class="mi">1000</span><span class="p">)</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="nb">sum</span><span class="p">)</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="jb_output_wrapper }}">
+<div class="output_area">
+
+
+<div class="output_html rendered_html output_subarea output_execute_result">
+
+    <table>
+      <thead>
+        <th width="10%">Index</th>
+        <th width="90%">Result</th>
+      </thead>
+      <tbody>
+        
+        <tr>
+          <td>0</td><td>11</td>
+        </tr>
+        
+        <tr>
+          <td>1</td><td>6</td>
+        </tr>
+        
+        <tr>
+          <td>2</td><td>10</td>
+        </tr>
+        
+        <tr>
+          <td>3</td><td>5</td>
+        </tr>
+        
+        <tr>
+          <td>4</td><td>5</td>
+        </tr>
+        
+        <tr>
+          <td>5</td><td>4</td>
+        </tr>
+        
+        <tr>
+          <td>6</td><td>4</td>
+        </tr>
+        
+        <tr>
+          <td>7</td><td>3</td>
+        </tr>
+        
+        <tr>
+          <td>8</td><td>8</td>
+        </tr>
+        <tr><td>...</td><td>...</td></tr>
+        <tr>
+          <td>999</td><td>5</td>
+        </tr>
+        
+      </tbody>
+    </table>
+        
+</div>
+
+</div>
+</div>
+</div>
+</div>
+
+</div>
+</div>
+
+<div class="jb_cell">
+
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>User defined functions can also be applied.  Standard Python commands can be used to define functions.</p>
+<p><em>Example.</em> Ten cards labeled 1, 2, $\ldots$, 10 are shuffled and dealt one at a time.  Find the the probability that the number on the card matches its position in the deal for at least one of the cards.  (For example, a match occurs if card 3 is the third card dealt.)</p>
+<p>First we define a probability space whose outcomes correspond to ordered deals of the cards.  Each realization of the simulation is a permutation of the numbers 0, 1, $\ldots$ 9 (using Python indexing).  Simulate 10000 realizations and store as <code>sims</code>.</p>
+
+</div>
+</div>
+</div>
+</div>
+
+<div class="jb_cell">
+
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">n</span> <span class="o">=</span> <span class="mi">10</span>
+<span class="n">labels</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="n">n</span><span class="p">))</span> <span class="c1"># remember, Python starts the index at 0, so the cards are labebeled 0, ..., 9</span>
+<span class="n">P</span> <span class="o">=</span> <span class="n">BoxModel</span><span class="p">(</span><span class="n">labels</span><span class="p">,</span> <span class="n">size</span> <span class="o">=</span> <span class="n">n</span><span class="p">,</span> <span class="n">replace</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span>
+<span class="n">sims</span> <span class="o">=</span> <span class="n">P</span><span class="o">.</span><span class="n">sim</span><span class="p">(</span><span class="mi">10000</span><span class="p">)</span>
+<span class="n">sims</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="jb_output_wrapper }}">
+<div class="output_area">
+
+
+<div class="output_html rendered_html output_subarea output_execute_result">
+
+    <table>
+      <thead>
+        <th width="10%">Index</th>
+        <th width="90%">Result</th>
+      </thead>
+      <tbody>
+        
+        <tr>
+          <td>0</td><td>(5, 9, 4, 0, 3, ..., 6)</td>
+        </tr>
+        
+        <tr>
+          <td>1</td><td>(3, 7, 9, 1, 2, ..., 0)</td>
+        </tr>
+        
+        <tr>
+          <td>2</td><td>(9, 8, 5, 7, 3, ..., 1)</td>
+        </tr>
+        
+        <tr>
+          <td>3</td><td>(7, 0, 2, 6, 3, ..., 8)</td>
+        </tr>
+        
+        <tr>
+          <td>4</td><td>(8, 6, 0, 4, 9, ..., 1)</td>
+        </tr>
+        
+        <tr>
+          <td>5</td><td>(9, 7, 3, 4, 1, ..., 2)</td>
+        </tr>
+        
+        <tr>
+          <td>6</td><td>(3, 6, 1, 4, 9, ..., 2)</td>
+        </tr>
+        
+        <tr>
+          <td>7</td><td>(8, 6, 5, 9, 7, ..., 1)</td>
+        </tr>
+        
+        <tr>
+          <td>8</td><td>(1, 8, 7, 5, 2, ..., 6)</td>
+        </tr>
+        <tr><td>...</td><td>...</td></tr>
+        <tr>
+          <td>9999</td><td>(2, 6, 7, 5, 3, ..., 8)</td>
+        </tr>
+        
+      </tbody>
+    </table>
+        
+</div>
+
+</div>
+</div>
+</div>
+</div>
+
+</div>
+</div>
+
+<div class="jb_cell">
+
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>Next we define a function <code>is_match</code> which takes as an input a permutation of 0, $\ldots$, 9 and checks if there is at least once match.  (Defining custom functions like this is the main way that Python code is used with Symbulate.)</p>
+
+</div>
+</div>
+</div>
+</div>
+
+<div class="jb_cell">
+
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="k">def</span> <span class="nf">is_match</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">x</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">==</span> <span class="n">labels</span><span class="p">[</span><span class="n">i</span><span class="p">]:</span>
+            <span class="k">return</span> <span class="s1">&#39;At least one match&#39;</span>
+    <span class="k">return</span> <span class="s1">&#39;No match&#39;</span>
+    
+<span class="n">is_match</span><span class="p">((</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">6</span><span class="p">,</span> <span class="mi">7</span><span class="p">,</span> <span class="mi">8</span><span class="p">,</span> <span class="mi">9</span><span class="p">,</span> <span class="mi">4</span><span class="p">))</span> <span class="c1"># for the outcome, card 3 matches position 3</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="jb_output_wrapper }}">
+<div class="output_area">
+
+
+
+<div class="output_text output_subarea output_execute_result">
+<pre>&#39;At least one match&#39;</pre>
+</div>
+
+</div>
+</div>
+</div>
+</div>
+
+</div>
+</div>
+
+<div class="jb_cell">
+
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>Now we apply the <code>is_match</code> function to the simulated realizations, stored in <code>sims</code>.</p>
+
+</div>
+</div>
+</div>
+</div>
+
+<div class="jb_cell">
+
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">sims</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="n">is_match</span><span class="p">)</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="jb_output_wrapper }}">
+<div class="output_area">
+
+
+<div class="output_html rendered_html output_subarea output_execute_result">
+
+    <table>
+      <thead>
+        <th width="10%">Index</th>
+        <th width="90%">Result</th>
+      </thead>
+      <tbody>
+        
+        <tr>
+          <td>0</td><td>No match</td>
+        </tr>
+        
+        <tr>
+          <td>1</td><td>At least one match</td>
+        </tr>
+        
+        <tr>
+          <td>2</td><td>At least one match</td>
+        </tr>
+        
+        <tr>
+          <td>3</td><td>At least one match</td>
+        </tr>
+        
+        <tr>
+          <td>4</td><td>No match</td>
+        </tr>
+        
+        <tr>
+          <td>5</td><td>No match</td>
+        </tr>
+        
+        <tr>
+          <td>6</td><td>No match</td>
+        </tr>
+        
+        <tr>
+          <td>7</td><td>No match</td>
+        </tr>
+        
+        <tr>
+          <td>8</td><td>No match</td>
+        </tr>
+        <tr><td>...</td><td>...</td></tr>
+        <tr>
+          <td>9999</td><td>No match</td>
+        </tr>
+        
+      </tbody>
+    </table>
+        
+</div>
+
+</div>
+</div>
+</div>
+</div>
+
+</div>
+</div>
+
+<div class="jb_cell">
+
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>Finally, there are various ways to estimate the probability of at least one match, which will be described below.  For example, the "match/no match" results could be tabulated to determine the relative frequence of a match.</p>
+
+</div>
+</div>
+</div>
+</div>
+
+<div class="jb_cell">
+
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">sims</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="n">is_match</span><span class="p">)</span><span class="o">.</span><span class="n">tabulate</span><span class="p">(</span><span class="n">normalize</span> <span class="o">=</span> <span class="kc">True</span><span class="p">)</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="jb_output_wrapper }}">
+<div class="output_area">
+
+
+<div class="output_html rendered_html output_subarea output_execute_result">
+
+<table>
+  <thead>
+    <th width="80%">Outcome</th>
+    <th width="20%">Value</th>
+  </thead>
+  <tbody>
+    <tr><td>At least one match</td><td>0.6253</td></tr><tr><td>No match</td><td>0.3747</td></tr><tr><td><b>Total</b></td><td><b>1.0</b></td></tr>
+  </tbody>
+</table>
+
+</div>
+
+</div>
+</div>
+</div>
+</div>
+
+</div>
+</div>
+
+<div class="jb_cell">
+
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p><a id='tabulate'></a></p>
+
+</div>
+</div>
+</div>
+</div>
+
+<div class="jb_cell">
+
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h3 id="Tabulate">Tabulate<a class="anchor-link" href="#Tabulate"> </a></h3><p>The results of a simulation can be quickly tabulated using <code>.tabulate()</code>.  Tabulate counts the number of times each particular outcome occurs among the simulated realizations.  Use <code>.tabulate(normalize=True)</code> to find the proportion (relative frequency) of times each outcome occurs.</p>
+<p><strong>Example.</strong> Roll two fair four-sided.  Each realization is an ordered pair of rolls.  There are 16 possible ordered pairs - (1, 1), (1, 2), ..., (4, 3), (4, 4) - all equally likely.</p>
+
+</div>
+</div>
+</div>
+</div>
+
+<div class="jb_cell">
+
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">die</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">4</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span> <span class="c1"># this is just a list of the numbers 1 through 4</span>
+<span class="n">roll</span> <span class="o">=</span> <span class="n">BoxModel</span><span class="p">(</span><span class="n">die</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+<span class="n">rolls</span> <span class="o">=</span> <span class="n">roll</span><span class="o">.</span><span class="n">sim</span><span class="p">(</span><span class="mi">16000</span><span class="p">)</span>
+<span class="n">rolls</span><span class="o">.</span><span class="n">tabulate</span><span class="p">()</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="jb_output_wrapper }}">
+<div class="output_area">
+
+
+<div class="output_html rendered_html output_subarea output_execute_result">
+
+<table>
+  <thead>
+    <th width="80%">Outcome</th>
+    <th width="20%">Value</th>
+  </thead>
+  <tbody>
+    <tr><td>(1, 1)</td><td>1061</td></tr><tr><td>(1, 2)</td><td>990</td></tr><tr><td>(1, 3)</td><td>980</td></tr><tr><td>(1, 4)</td><td>1044</td></tr><tr><td>(2, 1)</td><td>989</td></tr><tr><td>(2, 2)</td><td>984</td></tr><tr><td>(2, 3)</td><td>971</td></tr><tr><td>(2, 4)</td><td>1027</td></tr><tr><td>(3, 1)</td><td>954</td></tr><tr><td>(3, 2)</td><td>1025</td></tr><tr><td>(3, 3)</td><td>972</td></tr><tr><td>(3, 4)</td><td>990</td></tr><tr><td>(4, 1)</td><td>985</td></tr><tr><td>(4, 2)</td><td>989</td></tr><tr><td>(4, 3)</td><td>1023</td></tr><tr><td>(4, 4)</td><td>1016</td></tr><tr><td><b>Total</b></td><td><b>16000</b></td></tr>
+  </tbody>
+</table>
+
+</div>
+
+</div>
+</div>
+</div>
+</div>
+
+</div>
+</div>
+
+<div class="jb_cell">
+
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>Now sum the dice, and approximate the probability distribution of the sum using tabulate with the normalize option.</p>
+
+</div>
+</div>
+</div>
+</div>
+
+<div class="jb_cell">
+
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">rolls</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="nb">sum</span><span class="p">)</span><span class="o">.</span><span class="n">tabulate</span><span class="p">(</span><span class="n">normalize</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="jb_output_wrapper }}">
+<div class="output_area">
+
+
+<div class="output_html rendered_html output_subarea output_execute_result">
+
+<table>
+  <thead>
+    <th width="80%">Outcome</th>
+    <th width="20%">Value</th>
+  </thead>
+  <tbody>
+    <tr><td>2</td><td>0.0663125</td></tr><tr><td>3</td><td>0.1236875</td></tr><tr><td>4</td><td>0.182375</td></tr><tr><td>5</td><td>0.2515625</td></tr><tr><td>6</td><td>0.18675</td></tr><tr><td>7</td><td>0.1258125</td></tr><tr><td>8</td><td>0.0635</td></tr><tr><td><b>Total</b></td><td><b>1.0</b></td></tr>
+  </tbody>
+</table>
+
+</div>
+
+</div>
+</div>
+</div>
+</div>
+
+</div>
+</div>
+
+<div class="jb_cell">
+
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>Individual entries of the table can be referenced using <code>.tabulate()[label]</code> where label represents the value of interest.</p>
+
+</div>
+</div>
+</div>
+</div>
+
+<div class="jb_cell">
+
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">rolls</span><span class="o">.</span><span class="n">tabulate</span><span class="p">()[(</span><span class="mi">2</span><span class="p">,</span><span class="mi">4</span><span class="p">)]</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="jb_output_wrapper }}">
+<div class="output_area">
+
+
+
+<div class="output_text output_subarea output_execute_result">
+<pre>1027</pre>
+</div>
+
+</div>
+</div>
+</div>
+</div>
+
+</div>
+</div>
+
+<div class="jb_cell">
+
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">roll_sum</span> <span class="o">=</span> <span class="n">rolls</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="nb">sum</span><span class="p">)</span><span class="o">.</span><span class="n">tabulate</span><span class="p">(</span><span class="n">normalize</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="n">roll_sum</span><span class="p">[</span><span class="mi">6</span><span class="p">]</span> <span class="o">+</span> <span class="n">roll_sum</span><span class="p">[</span><span class="mi">7</span><span class="p">]</span> <span class="o">+</span> <span class="n">roll_sum</span><span class="p">[</span><span class="mi">8</span><span class="p">]</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="jb_output_wrapper }}">
+<div class="output_area">
+
+
+
+<div class="output_text output_subarea output_execute_result">
+<pre>0.37606249999999997</pre>
+</div>
+
+</div>
+</div>
+</div>
+</div>
+
+</div>
+</div>
+
+<div class="jb_cell">
+
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>By default, tabulate only tabulates those outcomes which are among the simulated values, rather than all possible outcomes.  An argument can be passed to <code>.tabulate()</code> to tabulate all outcomes in a given list.</p>
+
+</div>
+</div>
+</div>
+</div>
+
+<div class="jb_cell">
+
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">die</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">4</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span> <span class="c1"># this is just a list of the number 1 through 4</span>
+<span class="n">rolls</span> <span class="o">=</span> <span class="n">BoxModel</span><span class="p">(</span><span class="n">die</span><span class="p">)</span><span class="o">.</span><span class="n">sim</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
+<span class="n">rolls</span><span class="o">.</span><span class="n">tabulate</span><span class="p">(</span><span class="n">die</span><span class="p">)</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="jb_output_wrapper }}">
+<div class="output_area">
+
+
+<div class="output_html rendered_html output_subarea output_execute_result">
+
+<table>
+  <thead>
+    <th width="80%">Outcome</th>
+    <th width="20%">Value</th>
+  </thead>
+  <tbody>
+    <tr><td>1</td><td>1</td></tr><tr><td>2</td><td>0</td></tr><tr><td>3</td><td>1</td></tr><tr><td>4</td><td>0</td></tr><tr><td><b>Total</b></td><td><b>2</b></td></tr>
+  </tbody>
+</table>
+
+</div>
+
+</div>
+</div>
+</div>
+</div>
+
+</div>
+</div>
+
+<div class="jb_cell">
+
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># Compare with</span>
+<span class="n">rolls</span><span class="o">.</span><span class="n">tabulate</span><span class="p">()</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="jb_output_wrapper }}">
+<div class="output_area">
+
+
+<div class="output_html rendered_html output_subarea output_execute_result">
+
+<table>
+  <thead>
+    <th width="80%">Outcome</th>
+    <th width="20%">Value</th>
+  </thead>
+  <tbody>
+    <tr><td>1</td><td>1</td></tr><tr><td>3</td><td>1</td></tr><tr><td><b>Total</b></td><td><b>2</b></td></tr>
+  </tbody>
+</table>
+
+</div>
+
+</div>
+</div>
+</div>
+</div>
+
+</div>
+</div>
+
+<div class="jb_cell">
+
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>By default, the outcomes in the table produced by <code>.tabulate()</code> are in alphanumeric order.  A list can be passed to <code>.tabulate()</code> to achieve a specified order.</p>
+
+</div>
+</div>
+</div>
+</div>
+
+<div class="jb_cell">
+
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">BoxModel</span><span class="p">([</span><span class="s1">&#39;a&#39;</span><span class="p">,</span> <span class="s1">&#39;b&#39;</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">])</span><span class="o">.</span><span class="n">sim</span><span class="p">(</span><span class="mi">10</span><span class="p">)</span><span class="o">.</span><span class="n">tabulate</span><span class="p">([</span><span class="mi">3</span><span class="p">,</span> <span class="s1">&#39;a&#39;</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="s1">&#39;b&#39;</span><span class="p">,</span> <span class="mi">1</span><span class="p">])</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="jb_output_wrapper }}">
+<div class="output_area">
+
+
+<div class="output_html rendered_html output_subarea output_execute_result">
+
+<table>
+  <thead>
+    <th width="80%">Outcome</th>
+    <th width="20%">Value</th>
+  </thead>
+  <tbody>
+    <tr><td>3</td><td>1</td></tr><tr><td>a</td><td>6</td></tr><tr><td>2</td><td>1</td></tr><tr><td>b</td><td>0</td></tr><tr><td>1</td><td>2</td></tr><tr><td><b>Total</b></td><td><b>10</b></td></tr>
+  </tbody>
+</table>
+
+</div>
+
+</div>
+</div>
+</div>
+</div>
+
+</div>
+</div>
+
+<div class="jb_cell">
+
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p><a id='count'></a></p>
+
+</div>
+</div>
+</div>
+</div>
+
+<div class="jb_cell">
+
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h3 id="Count">Count<a class="anchor-link" href="#Count"> </a></h3><p>You can count the number of simulated realizations equal to a particular value using <code>count_eq()</code>.</p>
+
+</div>
+</div>
+</div>
+</div>
+
+<div class="jb_cell">
+
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">BoxModel</span><span class="p">([</span><span class="s1">&#39;H&#39;</span><span class="p">,</span><span class="s1">&#39;T&#39;</span><span class="p">])</span><span class="o">.</span><span class="n">sim</span><span class="p">(</span><span class="mi">10000</span><span class="p">)</span><span class="o">.</span><span class="n">count_eq</span><span class="p">(</span><span class="s1">&#39;H&#39;</span><span class="p">)</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="jb_output_wrapper }}">
+<div class="output_area">
+
+
+
+<div class="output_text output_subarea output_execute_result">
+<pre>5017</pre>
+</div>
+
+</div>
+</div>
+</div>
+</div>
+
+</div>
+</div>
+
+<div class="jb_cell">
+
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">die</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">4</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span> <span class="c1"># this is just a list of the number 1 through 4</span>
+<span class="n">roll</span> <span class="o">=</span> <span class="n">BoxModel</span><span class="p">(</span><span class="n">die</span><span class="p">,</span> <span class="n">size</span> <span class="o">=</span> <span class="mi">2</span><span class="p">)</span>
+<span class="n">rolls</span> <span class="o">=</span> <span class="n">roll</span><span class="o">.</span><span class="n">sim</span><span class="p">(</span><span class="mi">16000</span><span class="p">)</span>
+<span class="n">rolls</span><span class="o">.</span><span class="n">count_eq</span><span class="p">((</span><span class="mi">2</span><span class="p">,</span><span class="mi">4</span><span class="p">))</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="jb_output_wrapper }}">
+<div class="output_area">
+
+
+
+<div class="output_text output_subarea output_execute_result">
+<pre>1012</pre>
+</div>
+
+</div>
+</div>
+</div>
+</div>
+
+</div>
+</div>
+
+<div class="jb_cell">
+
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>In addition to <code>.count_eq()</code>, the following count functions can be used when the values are numerical.</p>
+<ul>
+<li><code>.count_neq()</code> counts the values <em>not equal to</em> the argument</li>
+<li><code>.count_lt()</code> counts the values <em>less than</em> the argument</li>
+<li><code>.count_leq()</code> counts the values <em>less than or equal to</em> the argument</li>
+<li><code>.count_gt()</code> counts the values <em>greater than</em> the argument</li>
+<li><code>.count_geq()</code> counts the values <em>greater than or equal to</em> the argument</li>
+</ul>
+
+</div>
+</div>
+</div>
+</div>
+
+<div class="jb_cell">
+
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">rolls</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="nb">sum</span><span class="p">)</span><span class="o">.</span><span class="n">count_geq</span><span class="p">(</span><span class="mi">6</span><span class="p">)</span> <span class="o">/</span> <span class="mi">16000</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="jb_output_wrapper }}">
+<div class="output_area">
+
+
+
+<div class="output_text output_subarea output_execute_result">
+<pre>0.3731875</pre>
+</div>
+
+</div>
+</div>
+</div>
+</div>
+
+</div>
+</div>
+
+<div class="jb_cell">
+
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>You can also count the number of outcomes which satisfy some criteria specified by a user defined function. Define a function that returns <code>True</code> for the outcomes you want to count, and pass the function into <code>.count()</code>. For example, the following code is equivalent to using <code>.count_geq(6)</code>.</p>
+
+</div>
+</div>
+</div>
+</div>
+
+<div class="jb_cell">
+
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="k">def</span> <span class="nf">greater_than_or_equal_to_6</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">x</span> <span class="o">&gt;=</span> <span class="mi">6</span>
+
+<span class="n">rolls</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="nb">sum</span><span class="p">)</span><span class="o">.</span><span class="n">count</span><span class="p">(</span><span class="n">greater_than_or_equal_to_6</span><span class="p">)</span> <span class="o">/</span> <span class="mi">16000</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="jb_output_wrapper }}">
+<div class="output_area">
+
+
+
+<div class="output_text output_subarea output_execute_result">
+<pre>0.3731875</pre>
+</div>
+
+</div>
+</div>
+</div>
+</div>
+
+</div>
+</div>
+
+<div class="jb_cell">
+
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>Custom functions can also be used to count based on multiple criteria.  For example, the following counts the pairs of rolls in which the first roll is equal to 2 and the second roll is at most 3.</p>
+
+</div>
+</div>
+</div>
+</div>
+
+<div class="jb_cell">
+
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="k">def</span> <span class="nf">custom_count</span><span class="p">(</span><span class="n">x</span><span class="p">):</span> <span class="c1"># x represents a pair of values (x[0], x[1])</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">x</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="mi">2</span><span class="p">)</span> <span class="o">&amp;</span> <span class="p">(</span><span class="n">x</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">&lt;=</span> <span class="mi">3</span><span class="p">):</span>
+        <span class="k">return</span> <span class="kc">True</span>
+
+<span class="n">rolls</span><span class="o">.</span><span class="n">count</span><span class="p">(</span><span class="n">custom_count</span><span class="p">)</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="jb_output_wrapper }}">
+<div class="output_area">
+
+
+
+<div class="output_text output_subarea output_execute_result">
+<pre>3112</pre>
+</div>
+
+</div>
+</div>
+</div>
+</div>
+
+</div>
+</div>
+
+<div class="jb_cell">
+
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>Counting can also be accomplished by creating logical (True = 1, False = 0) values according to whether an outcome satisfies some criteria and then summing.</p>
+
+</div>
+</div>
+</div>
+</div>
+
+<div class="jb_cell">
+
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">rollsums</span> <span class="o">=</span> <span class="n">rolls</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="nb">sum</span><span class="p">)</span>
+<span class="nb">sum</span><span class="p">(</span><span class="n">rollsums</span> <span class="o">&gt;=</span> <span class="mi">6</span><span class="p">)</span> <span class="o">/</span> <span class="mi">16000</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="jb_output_wrapper }}">
+<div class="output_area">
+
+
+
+<div class="output_text output_subarea output_execute_result">
+<pre>0.3731875</pre>
+</div>
+
+</div>
+</div>
+</div>
+</div>
+
+</div>
+</div>
+
+<div class="jb_cell">
+
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>Since a mean (average) is the sum of values divided by the number of values, changing sum to mean in the above method returns the relative frequency directly (without having to divide by the number of values).</p>
+
+</div>
+</div>
+</div>
+</div>
+
+<div class="jb_cell">
+
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">mean</span><span class="p">(</span><span class="n">rollsums</span> <span class="o">&gt;=</span> <span class="mi">6</span><span class="p">)</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="jb_output_wrapper }}">
+<div class="output_area">
+
+
+
+<div class="output_text output_subarea output_execute_result">
+<pre>0.3731875</pre>
+</div>
+
+</div>
+</div>
+</div>
+</div>
+
+</div>
+</div>
+
+<div class="jb_cell">
+
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p><a id='filter'></a></p>
+
+</div>
+</div>
+</div>
+</div>
+
+<div class="jb_cell">
+
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h3 id="Filter">Filter<a class="anchor-link" href="#Filter"> </a></h3><p>You can get the subset of simulated realizations equal to a particular value using <code>.filter_eq()</code>.</p>
+
+</div>
+</div>
+</div>
+</div>
+
+<div class="jb_cell">
+
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">Heads</span> <span class="o">=</span> <span class="n">BoxModel</span><span class="p">([</span><span class="s1">&#39;H&#39;</span><span class="p">,</span><span class="s1">&#39;T&#39;</span><span class="p">])</span><span class="o">.</span><span class="n">sim</span><span class="p">(</span><span class="mi">10000</span><span class="p">)</span><span class="o">.</span><span class="n">filter_eq</span><span class="p">(</span><span class="s1">&#39;H&#39;</span><span class="p">)</span>
+<span class="n">Heads</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="jb_output_wrapper }}">
+<div class="output_area">
+
+
+<div class="output_html rendered_html output_subarea output_execute_result">
+
+    <table>
+      <thead>
+        <th width="10%">Index</th>
+        <th width="90%">Result</th>
+      </thead>
+      <tbody>
+        
+        <tr>
+          <td>0</td><td>H</td>
+        </tr>
+        
+        <tr>
+          <td>1</td><td>H</td>
+        </tr>
+        
+        <tr>
+          <td>2</td><td>H</td>
+        </tr>
+        
+        <tr>
+          <td>3</td><td>H</td>
+        </tr>
+        
+        <tr>
+          <td>4</td><td>H</td>
+        </tr>
+        
+        <tr>
+          <td>5</td><td>H</td>
+        </tr>
+        
+        <tr>
+          <td>6</td><td>H</td>
+        </tr>
+        
+        <tr>
+          <td>7</td><td>H</td>
+        </tr>
+        
+        <tr>
+          <td>8</td><td>H</td>
+        </tr>
+        <tr><td>...</td><td>...</td></tr>
+        <tr>
+          <td>4915</td><td>H</td>
+        </tr>
+        
+      </tbody>
+    </table>
+        
+</div>
+
+</div>
+</div>
+</div>
+</div>
+
+</div>
+</div>
+
+<div class="jb_cell">
+
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>Using <code>len</code> (length) with the filter functions is one way to count the simulated occurrences of outcomes which satisfy some criteria.</p>
+
+</div>
+</div>
+</div>
+</div>
+
+<div class="jb_cell">
+
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="nb">len</span><span class="p">(</span><span class="n">Heads</span><span class="p">)</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="jb_output_wrapper }}">
+<div class="output_area">
+
+
+
+<div class="output_text output_subarea output_execute_result">
+<pre>4916</pre>
+</div>
+
+</div>
+</div>
+</div>
+</div>
+
+</div>
+</div>
+
+<div class="jb_cell">
+
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>In addition to <code>.filter_eq()</code>, the following filter functions can be used when the values are numerical.</p>
+<ul>
+<li><code>.filter_neq()</code> subsets the values <em>not equal to</em> the argument</li>
+<li><code>.filter_lt()</code> subsets the values <em>less than</em> the argument</li>
+<li><code>.filter_leq()</code> subsets the values <em>less than or equal to</em> the argument</li>
+<li><code>.filter_gt()</code> subsets the values <em>greater than</em> the argument</li>
+<li><code>.filter_geq()</code> subsets the values <em>greater than or equal to</em> the argument</li>
+</ul>
+
+</div>
+</div>
+</div>
+</div>
+
+<div class="jb_cell">
+
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">die</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="o">+</span><span class="mi">4</span><span class="p">))</span> <span class="c1"># this is just a list of the number 1 through 4</span>
+<span class="n">sims</span> <span class="o">=</span> <span class="n">BoxModel</span><span class="p">(</span><span class="n">die</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span><span class="o">.</span><span class="n">sim</span><span class="p">(</span><span class="mi">1000</span><span class="p">)</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="nb">sum</span><span class="p">)</span>
+<span class="nb">len</span><span class="p">(</span><span class="n">sims</span><span class="o">.</span><span class="n">filter_geq</span><span class="p">(</span><span class="mi">6</span><span class="p">))</span> <span class="o">/</span> <span class="mi">1000</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="jb_output_wrapper }}">
+<div class="output_area">
+
+
+
+<div class="output_text output_subarea output_execute_result">
+<pre>0.357</pre>
+</div>
+
+</div>
+</div>
+</div>
+</div>
+
+</div>
+</div>
+
+<div class="jb_cell">
+
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>You can also define your own custom filter function. Define a function that returns <code>True</code> for the outcomes you want to keep, and pass the function into <code>.filter()</code>. For example, the following code is equivalent to using <code>.filter_geq(6)</code>.</p>
+
+</div>
+</div>
+</div>
+</div>
+
+<div class="jb_cell">
+
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="k">def</span> <span class="nf">greater_than_or_equal_to_6</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">x</span> <span class="o">&gt;=</span> <span class="mi">6</span>
+
+<span class="nb">len</span><span class="p">(</span><span class="n">sims</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">greater_than_or_equal_to_6</span><span class="p">))</span> <span class="o">/</span> <span class="mi">1000</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="jb_output_wrapper }}">
+<div class="output_area">
+
+
+
+<div class="output_text output_subarea output_execute_result">
+<pre>0.357</pre>
+</div>
+
+</div>
+</div>
+</div>
+</div>
+
+</div>
+</div>
+
+<div class="jb_cell">
+
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p><a id='get'></a></p>
+
+</div>
+</div>
+</div>
+</div>
+
+<div class="jb_cell">
+
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h3 id="Get">Get<a class="anchor-link" href="#Get"> </a></h3><p>The outcome of a particular repetition of the simulation can be accessed with <code>.get()</code>.  Recall that Python starts an index at 0, so <code>.get(0)</code> returns the first simulated value, <code>.get(1)</code> the second, etc.</p>
+
+</div>
+</div>
+</div>
+</div>
+
+<div class="jb_cell">
+
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">die</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">4</span><span class="o">+</span><span class="mi">1</span><span class="p">))</span> <span class="c1"># this is just a list of the number 1 through 4</span>
+<span class="n">roll</span> <span class="o">=</span> <span class="n">BoxModel</span><span class="p">(</span><span class="n">die</span><span class="p">,</span> <span class="n">size</span> <span class="o">=</span> <span class="mi">2</span><span class="p">)</span>
+<span class="n">sims</span> <span class="o">=</span> <span class="n">roll</span><span class="o">.</span><span class="n">sim</span><span class="p">(</span><span class="mi">4</span><span class="p">)</span>
+<span class="n">sims</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="jb_output_wrapper }}">
+<div class="output_area">
+
+
+<div class="output_html rendered_html output_subarea output_execute_result">
+
+    <table>
+      <thead>
+        <th width="10%">Index</th>
+        <th width="90%">Result</th>
+      </thead>
+      <tbody>
+        
+        <tr>
+          <td>0</td><td>(4, 4)</td>
+        </tr>
+        
+        <tr>
+          <td>1</td><td>(4, 1)</td>
+        </tr>
+        
+        <tr>
+          <td>2</td><td>(1, 4)</td>
+        </tr>
+        
+        <tr>
+          <td>3</td><td>(1, 1)</td>
+        </tr>
+        
+      </tbody>
+    </table>
+        
+</div>
+
+</div>
+</div>
+</div>
+</div>
+
+</div>
+</div>
+
+<div class="jb_cell">
+
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">sims</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="jb_output_wrapper }}">
+<div class="output_area">
+
+
+
+<div class="output_text output_subarea output_execute_result">
+<pre>(4, 4)</pre>
+</div>
+
+</div>
+</div>
+</div>
+</div>
+
+</div>
+</div>
+
+<div class="jb_cell">
+
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">sims</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="jb_output_wrapper }}">
+<div class="output_area">
+
+
+
+<div class="output_text output_subarea output_execute_result">
+<pre>(1, 4)</pre>
+</div>
+
+</div>
+</div>
+</div>
+</div>
+
+</div>
+</div>
+
+<div class="jb_cell">
+
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p><a id='recap'></a></p>
+
+</div>
+</div>
+</div>
+</div>
+
+<div class="jb_cell">
+
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h3 id="Summary-of-commands">Summary of commands<a class="anchor-link" href="#Summary-of-commands"> </a></h3><p>The tabulate, count, and filter functions in Symbulate allow for several ways of manipulating the outcomes of a simulation.  As an example, here is a recap of some of the ways Symbulate can be used to estimate the probability that the sum of two fair four-sided dice is at least 6.</p>
+
+</div>
+</div>
+</div>
+</div>
+
+<div class="jb_cell">
+
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">die</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">4</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span> <span class="c1"># this is just a list of the number 1 through 4</span>
+<span class="n">roll</span> <span class="o">=</span> <span class="n">BoxModel</span><span class="p">(</span><span class="n">die</span><span class="p">,</span> <span class="n">size</span> <span class="o">=</span> <span class="mi">2</span><span class="p">)</span>
+<span class="n">rolls</span> <span class="o">=</span> <span class="n">roll</span><span class="o">.</span><span class="n">sim</span><span class="p">(</span><span class="mi">10000</span><span class="p">)</span>
+<span class="n">rollsums</span> <span class="o">=</span> <span class="n">rolls</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="nb">sum</span><span class="p">)</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+</div>
+
+<div class="jb_cell">
+
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">rollsums</span><span class="o">.</span><span class="n">count_geq</span><span class="p">(</span><span class="mi">6</span><span class="p">)</span> <span class="o">/</span> <span class="mi">10000</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="jb_output_wrapper }}">
+<div class="output_area">
+
+
+
+<div class="output_text output_subarea output_execute_result">
+<pre>0.3749</pre>
+</div>
+
+</div>
+</div>
+</div>
+</div>
+
+</div>
+</div>
+
+<div class="jb_cell">
+
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="p">(</span><span class="n">rollsums</span><span class="o">.</span><span class="n">tabulate</span><span class="p">()[</span><span class="mi">6</span><span class="p">]</span> <span class="o">+</span> <span class="n">rollsums</span><span class="o">.</span><span class="n">tabulate</span><span class="p">()[</span><span class="mi">7</span><span class="p">]</span> <span class="o">+</span> <span class="n">rollsums</span><span class="o">.</span><span class="n">tabulate</span><span class="p">()[</span><span class="mi">8</span><span class="p">])</span> <span class="o">/</span> <span class="mi">10000</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="jb_output_wrapper }}">
+<div class="output_area">
+
+
+
+<div class="output_text output_subarea output_execute_result">
+<pre>0.3749</pre>
+</div>
+
+</div>
+</div>
+</div>
+</div>
+
+</div>
+</div>
+
+<div class="jb_cell">
+
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="p">(</span><span class="n">rollsums</span><span class="o">.</span><span class="n">tabulate</span><span class="p">(</span><span class="n">normalize</span><span class="o">=</span><span class="kc">True</span><span class="p">)[</span><span class="mi">6</span><span class="p">]</span> <span class="o">+</span> <span class="n">rollsums</span><span class="o">.</span><span class="n">tabulate</span><span class="p">(</span><span class="n">normalize</span><span class="o">=</span><span class="kc">True</span><span class="p">)[</span><span class="mi">7</span><span class="p">]</span> <span class="o">+</span> <span class="n">rollsums</span><span class="o">.</span><span class="n">tabulate</span><span class="p">(</span><span class="n">normalize</span><span class="o">=</span><span class="kc">True</span><span class="p">)[</span><span class="mi">8</span><span class="p">])</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="jb_output_wrapper }}">
+<div class="output_area">
+
+
+
+<div class="output_text output_subarea output_execute_result">
+<pre>0.3749</pre>
+</div>
+
+</div>
+</div>
+</div>
+</div>
+
+</div>
+</div>
+
+<div class="jb_cell">
+
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="nb">len</span><span class="p">(</span><span class="n">rollsums</span><span class="o">.</span><span class="n">filter_geq</span><span class="p">(</span><span class="mi">6</span><span class="p">))</span> <span class="o">/</span> <span class="mi">10000</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="jb_output_wrapper }}">
+<div class="output_area">
+
+
+
+<div class="output_text output_subarea output_execute_result">
+<pre>0.3749</pre>
+</div>
+
+</div>
+</div>
+</div>
+</div>
+
+</div>
+</div>
+
+<div class="jb_cell">
+
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="nb">sum</span><span class="p">(</span><span class="n">rollsums</span> <span class="o">&gt;=</span> <span class="mi">6</span><span class="p">)</span> <span class="o">/</span> <span class="mi">10000</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="jb_output_wrapper }}">
+<div class="output_area">
+
+
+
+<div class="output_text output_subarea output_execute_result">
+<pre>0.3749</pre>
+</div>
+
+</div>
+</div>
+</div>
+</div>
+
+</div>
+</div>
+
+<div class="jb_cell">
+
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">mean</span><span class="p">(</span><span class="n">rollsums</span> <span class="o">&gt;=</span> <span class="mi">6</span><span class="p">)</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="jb_output_wrapper }}">
+<div class="output_area">
+
+
+
+<div class="output_text output_subarea output_execute_result">
+<pre>0.3749</pre>
+</div>
+
+</div>
+</div>
+</div>
+</div>
+
+</div>
+</div>
+
+<div class="jb_cell">
+
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>We will also see that <a href="rv.html">Random variables (RV)</a> and events play an extremely important roll in defining and simulating probabilistics objects.  The following code (1) defines a probability space corresponding to two rolls of a fair four-sided die, (2) define a RV X equal to the sum of the rolls, (3) simulates realizations of X and uses a count function.</p>
+
+</div>
+</div>
+</div>
+</div>
+
+<div class="jb_cell">
+
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">die</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">4</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span> <span class="c1"># this is just a list of the number 1 through 4</span>
+<span class="n">roll</span> <span class="o">=</span> <span class="n">BoxModel</span><span class="p">(</span><span class="n">die</span><span class="p">,</span> <span class="n">size</span> <span class="o">=</span> <span class="mi">2</span><span class="p">)</span>
+<span class="n">X</span> <span class="o">=</span> <span class="n">RV</span><span class="p">(</span><span class="n">roll</span><span class="p">,</span> <span class="nb">sum</span><span class="p">)</span>
+<span class="n">X</span><span class="o">.</span><span class="n">sim</span><span class="p">(</span><span class="mi">10000</span><span class="p">)</span><span class="o">.</span><span class="n">count_geq</span><span class="p">(</span><span class="mi">6</span><span class="p">)</span> <span class="o">/</span> <span class="mi">10000</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="jb_output_wrapper }}">
+<div class="output_area">
+
+
+
+<div class="output_text output_subarea output_execute_result">
+<pre>0.3693</pre>
+</div>
+
+</div>
+</div>
+</div>
+</div>
+
+</div>
+</div>
+
+<div class="jb_cell">
+
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>We can also simulate and summarize realizations of the event (X &gt;= 6).</p>
+
+</div>
+</div>
+</div>
+</div>
+
+<div class="jb_cell">
+
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="p">(</span><span class="n">X</span> <span class="o">&gt;=</span> <span class="mi">6</span><span class="p">)</span><span class="o">.</span><span class="n">sim</span><span class="p">(</span><span class="mi">10000</span><span class="p">)</span><span class="o">.</span><span class="n">tabulate</span><span class="p">(</span><span class="n">normalize</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="jb_output_wrapper }}">
+<div class="output_area">
+
+
+<div class="output_html rendered_html output_subarea output_execute_result">
+
+<table>
+  <thead>
+    <th width="80%">Outcome</th>
+    <th width="20%">Value</th>
+  </thead>
+  <tbody>
+    <tr><td>False</td><td>0.624</td></tr><tr><td>True</td><td>0.376</td></tr><tr><td><b>Total</b></td><td><b>1.0</b></td></tr>
+  </tbody>
+</table>
+
+</div>
+
+</div>
+</div>
+</div>
+</div>
+
+</div>
+</div>
+
+ 
+
+
+    </main>
+    
